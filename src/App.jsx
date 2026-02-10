@@ -22,15 +22,22 @@ export default function App() {
     { id: "t2", containerName: "Kaavi", alertLevel: 95, assignedTo: "Liisa", status: "Työn alla" },
   ]);
 
+  const [showPopup, setShowPopup] = useState(false);
+const [lastTask, setLastTask] = useState(null);
+
+
   const createTask = (container) => {
     const newTask = {
-      id: "t" + Date.now(),
+      id: container.id, 
       containerName: container.location,
       alertLevel: container.fillLevel,
       assignedTo: "Ei määritetty",
       status: "Työn alla"
     };
     setTasks(prev => [...prev, newTask]);
+
+    setLastTask(newTask);
+  setShowPopup(true);
   };
 
   return (
@@ -68,6 +75,19 @@ export default function App() {
             <Route path="/raportit" element={<Reports containers={containers} tasks={tasks} />} />
           </Routes>
         </main>
+
+{showPopup && (
+  <div className="task-popup">
+    <div className="task-popup-content">
+      <h4>Tehtävä lisätty</h4>
+      <p>Roska-astia {lastTask?.id}</p>
+
+      <button onClick={() => setShowPopup(false)}>
+        Sulje
+      </button>
+    </div>
+  </div>
+)}
 
       </div>
     </Router>

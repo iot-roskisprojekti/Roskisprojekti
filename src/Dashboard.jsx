@@ -38,6 +38,7 @@ export default function Dashboard({ containers, tasks, createTask }) {
           lastUpdate={bin.lastUpdate}
           isOnline={bin.isOnline}
           createTask={createTask}
+          isOngoing={ongoing.some(t => t.id === bin.id)}
         />
       ))}
     </div>
