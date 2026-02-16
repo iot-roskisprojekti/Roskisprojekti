@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart,
-  Bar,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-export default function Reports({ containers, tasks }) {
+export default function Reports({ containers }) {
   const [selectedContainer, setSelectedContainer] = useState(containers[0]);
   const [containerHistory, setContainerHistory] = useState([]);
+  const [emptyHistory, setEmptyHistory] = useState([]);
 
-  // Luo päivähistoria 14 päivälle
+  // Luo päivähistoria 14 päivälle (täyttöaste)
   const generateDailyHistory = (fillLevel) => {
     const days = 14;
     let history = [];
@@ -30,25 +22,40 @@ export default function Reports({ containers, tasks }) {
     return history;
   };
 
+  // Luo tyhjennyshistoria viimeiseltä 14 päivältä
+  const generateEmptyHistory = () => {
+    const days = 14;
+    let history = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const timestamp = `${date.getDate()}.${date.getMonth() + 1}`;
+      const emptied = Math.random() < 0.3 ? 1 : 0; // 30% mahdollisuus tyhjentää
+      history.push({ timestamp, emptied });
+    }
+    return history;
+  };
+
   useEffect(() => {
     setContainerHistory(
       selectedContainer.history || generateDailyHistory(selectedContainer.fillLevel)
     );
+    setEmptyHistory(generateEmptyHistory());
   }, [selectedContainer]);
 
-  // Työtehtävien yhteenveto
-  const tasksSummary = tasks.reduce((acc, t) => {
-    acc[t.assignedTo] = (acc[t.assignedTo] || 0) + 1;
-    return acc;
-  }, {});
-  const barData = Object.entries(tasksSummary).map(([name, count]) => ({
-    name,
-    count,
-  }));
+  // Tilastoanalyysi
+  const fillLevels = containerHistory.map((h) => h.fillLevel);
+  const emptiedDays = emptyHistory.filter((h) => h.emptied).length;
+  const averageFill = Math.round(
+    fillLevels.reduce((sum, val) => sum + val, 0) / fillLevels.length
+  );
+  const maxFill = Math.max(...fillLevels);
+  const minFill = Math.min(...fillLevels);
+  const criticalDays = fillLevels.filter((val) => val > 80).length;
 
   return (
-    <section className="p-6 flex flex-col items-center space-y-8">
-      <h2 className="text-2xl font-bold text-center">Raportointi</h2>
+    <section className="p-6 flex flex-col items-center space-y-6">
+      <h2 className="text-2xl font-bold text-center mb-4">Raportointi</h2>
 
       {/* Säiliön valinta */}
       <div className="w-full max-w-md p-4 bg-white rounded shadow text-center">
@@ -71,7 +78,7 @@ export default function Reports({ containers, tasks }) {
       </div>
 
       {/* Säiliön tiedot */}
-      <div className="w-full max-w-md p-4 bg-white rounded shadow text-center">
+      <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-1">
         <h3 className="font-semibold mb-2">{selectedContainer.location}</h3>
         <p>Kapasiteetti: {selectedContainer.capacity} L</p>
         <p>Täyttöaste: {selectedContainer.fillLevel}%</p>
@@ -79,7 +86,7 @@ export default function Reports({ containers, tasks }) {
         <p>Status: {selectedContainer.isOnline ? "Online" : "Offline"}</p>
       </div>
 
-      {/* Trendikaavio kortilla */}
+      {/* Täyttöasteen trendi */}
       <div className="w-full max-w-3xl p-4 bg-white rounded shadow">
         <h3 className="font-semibold mb-4 text-center">
           Täyttöasteen trendi (päiväkohtainen): {selectedContainer.location}
@@ -98,20 +105,14 @@ export default function Reports({ containers, tasks }) {
         </LineChart>
       </div>
 
-      {/* Suoritetut työtehtävät */}
-      <div className="flex flex-col md:flex-row md:space-x-8 w-full justify-center">
-        <div className="flex-1 p-4 bg-white rounded shadow mb-6 md:mb-0">
-          <h3 className="font-semibold mb-2 text-center">
-            Suoritetut työtehtävät per työntekijä
-          </h3>
-          <BarChart width={400} height={300} data={barData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-            <Bar dataKey="count" fill="#61dafb" />
-          </BarChart>
-        </div>
+      {/* Tilastoanalyysi */}
+      <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
+        <h3 className="font-semibold mb-2">{selectedContainer.location} - tilastoanalyysi</h3>
+        <p>Keskimääräinen täyttöaste: {averageFill}%</p>
+        <p>Minimi täyttöaste: {minFill}%</p>
+        <p>Maksimi täyttöaste: {maxFill}%</p>
+        <p>Tyhjennykset viimeisen 14 päivän aikana: {emptiedDays}</p>
+        <p>{`Kriittiset päivät (>80% täyttöaste): ${criticalDays}`}</p>
       </div>
     </section>
   );
