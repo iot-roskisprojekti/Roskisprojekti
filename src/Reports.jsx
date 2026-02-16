@@ -25,8 +25,6 @@ export default function Reports({ containers, completedTasks }) {
   }
 
 
- 
-
   // Luo päivähistoria 14 päivälle (täyttöaste)
   const generateDailyHistory = (fillLevel) => {
     const days = 14;
@@ -59,16 +57,16 @@ export default function Reports({ containers, completedTasks }) {
 
   useEffect(() => {
 
-  if (!selectedContainer) return;
+    if (!selectedContainer) return;
 
-  setContainerHistory(
-    selectedContainer.history ||
-    generateDailyHistory(selectedContainer.fillLevel)
-  );
+    setContainerHistory(
+      selectedContainer.history ||
+      generateDailyHistory(selectedContainer.fillLevel)
+    );
 
-  setEmptyHistory(generateEmptyHistory());
+    setEmptyHistory(generateEmptyHistory());
 
-}, [selectedContainer]);
+  }, [selectedContainer]);
 
 
   // Tilastoanalyysi
@@ -81,6 +79,11 @@ export default function Reports({ containers, completedTasks }) {
   const minFill = Math.min(...fillLevels);
   const criticalDays = fillLevels.filter((val) => val > 80).length;
 
+  // Suodata vain tämän säiliön suoritetut tehtävät
+  const filteredCompletedTasks = completedTasks.filter(
+    task => task.containerId === selectedContainer.id
+  );
+
   return (
     <section className="p-6 flex flex-col items-center space-y-6">
       <h2 className="text-2xl font-bold text-center mb-4">Raportointi</h2>
@@ -89,18 +92,18 @@ export default function Reports({ containers, completedTasks }) {
       <div className="w-full max-w-md p-4 bg-white rounded shadow text-center">
         <label className="font-medium mr-2">Valitse säiliö:</label>
         <select
-  value={selectedContainer?.id || ""}
-  onChange={(e) => {
-    const found = containers.find(
-      (c) => c.id === e.target.value
-    );
+          value={selectedContainer?.id || ""}
+          onChange={(e) => {
+            const found = containers.find(
+              (c) => c.id === e.target.value
+            );
 
-    if (found) {
-      setSelectedContainer(found);
-    }
-  }}
-  className="border px-2 py-1 rounded"
->
+            if (found) {
+              setSelectedContainer(found);
+            }
+          }}
+          className="border px-2 py-1 rounded"
+        >
 
           {containers.map((c) => (
             <option key={c.id} value={c.id}>
@@ -149,24 +152,19 @@ export default function Reports({ containers, completedTasks }) {
       </div>
 
       {/* Suoritetut työtehtävät */}
-<div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
-  <h3 className="font-semibold mb-2">Suoritetut tyhjennykset</h3>
+      <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
+        <h3 className="font-semibold mb-2">Suoritetut tyhjennykset</h3>
 
-  {!completedTasks || completedTasks.length === 0 ? (
-
-    <p>Ei suoritettuja tehtäviä</p>
-  ) : (
-    completedTasks.map(task => (
-      <div key={task.id}>
-        {task.containerName} tyhjennetty – {task.completedAt}
+        {filteredCompletedTasks.length === 0 ? (
+          <p>Ei suoritettuja tehtäviä</p>
+        ) : (
+          filteredCompletedTasks.map(task => (
+            <div key={task.id}>
+              {task.containerName} tyhjennetty – {task.completedAt}
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
-
     </section>
-
-    
   );
-  
 }

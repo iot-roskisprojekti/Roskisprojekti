@@ -19,90 +19,84 @@ export default function App() {
   ]);
 
   const [tasks, setTasks] = useState([
-    { id: "t1", containerName: "Nilsiä", alertLevel: 80, assignedTo: "Matti"},
-    { id: "t2", containerName: "Kaavi", alertLevel: 95, assignedTo: "Liisa"},
+    { id: "t1", containerName: "Nilsiä", alertLevel: 80, assignedTo: "Matti" },
+    { id: "t2", containerName: "Kaavi", alertLevel: 95, assignedTo: "Liisa" },
   ]);
 
-  
-useEffect(() => {
-  setTasks(prevTasks => {
+  const [completedTasks, setCompletedTasks] = useState([]);
 
-    const updatedTasks = [...prevTasks];
+  useEffect(() => {
+    setTasks(prevTasks => {
 
-    containers.forEach(container => {
+      const updatedTasks = [...prevTasks];
 
-      if (container.fillLevel >= 70) {
+      containers.forEach(container => {
 
-        const exists = updatedTasks.some(
-          task => task.containerId === container.id
-        );
+        if (container.fillLevel >= 70) {
 
-        if (!exists) {
-          updatedTasks.push({
-            id: "auto-" + container.id,
-            containerId: container.id,
-            containerName: container.location,
-            alertLevel: container.fillLevel,
-            priority:
-              container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
-            assignedTo: "Ei osoitettu"
-          });
+          const exists = updatedTasks.some(
+            task => task.containerId === container.id
+          );
+
+          if (!exists) {
+            updatedTasks.push({
+              id: "auto-" + container.id,
+              containerId: container.id,
+              containerName: container.location,
+              alertLevel: container.fillLevel,
+              priority:
+                container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
+              assignedTo: "Ei osoitettu"
+            });
+          }
         }
-      }
+
+      });
+
+      return updatedTasks;
 
     });
+  }, [containers]);
 
-    return updatedTasks;
+  const handleCompleteTask = (taskId, containerId) => {
 
-  });
-}, [containers]);
+    // Nollaa säiliön täyttöaste
+    setContainers(prev =>
+      prev.map(c =>
+        c.id === containerId
+          ? { ...c, fillLevel: 0 }
+          : c
+      )
+    );
 
-const [completedTasks, setCompletedTasks] = useState([]);
+    // Siirrä tehtävä raportteihin
+    setTasks(prevTasks => {
+      const taskToComplete = prevTasks.find(t => t.id === taskId);
 
-const handleCompleteTask = (taskId, containerId) => {
+      if (taskToComplete) {
 
-  // 1️⃣ Nollaa säiliön täyttöaste
-  setContainers(prev =>
-    prev.map(c =>
-      c.id === containerId
-        ? { ...c, fillLevel: 0 }
-        : c
-    )
-  );
+        setCompletedTasks(prevCompleted => {
 
-  // 2️⃣ Siirrä tehtävä raportteihin
-  setTasks(prevTasks => {
-    const taskToComplete = prevTasks.find(t => t.id === taskId);
+          // tarkistus
+          const alreadyExists = prevCompleted.some(
+            t => t.id === taskId
+          );
 
-    if (taskToComplete) {
+          if (alreadyExists) return prevCompleted;
 
-      setCompletedTasks(prevCompleted => {
-
-        // 🔒 tarkistus
-        const alreadyExists = prevCompleted.some(
-          t => t.id === taskId
-        );
-
-        if (alreadyExists) return prevCompleted;
-
-        return [
-          ...prevCompleted,
-          {
-            ...taskToComplete,
-            completedAt: new Date().toLocaleString()
-          }
-        ];
-      });
-    }
-
-
-    // Poista avoimista
-    return prevTasks.filter(t => t.id !== taskId);
-  });
-
-};
-
-
+          return [
+            ...prevCompleted,
+            {
+              ...taskToComplete,
+              completedAt: new Date().toLocaleString()
+            }
+          ];
+        });
+      }
+      // Poista avoimista
+      return prevTasks.filter(t => t.id !== taskId);
+    });
+  };
 
   return (
     <Router>
@@ -114,7 +108,6 @@ const handleCompleteTask = (taskId, containerId) => {
             <h1>Älykäs jäteastioiden seuranta</h1>
             <p>Pilotissa 5 kohdetta</p>
           </div>
-
           <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
               <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
@@ -136,14 +129,11 @@ const handleCompleteTask = (taskId, containerId) => {
         <main className="content">
           <Routes>
             <Route path="/" element={<Dashboard containers={containers} tasks={tasks} />} />
-            <Route   path="/sailiot" element={<Containers containers={containers} setContainers={setContainers} />} />
-            <Route path="/tehtavat" element={<Tasks tasks={tasks} onCompleteTask={handleCompleteTask} /> }/>
-            <Route path="/raportit" element={<Reports containers={containers} completedTasks={completedTasks} /> } />
+            <Route path="/sailiot" element={<Containers containers={containers} setContainers={setContainers} />} />
+            <Route path="/tehtavat" element={<Tasks tasks={tasks} onCompleteTask={handleCompleteTask} />} />
+            <Route path="/raportit" element={<Reports containers={containers} completedTasks={completedTasks} />} />
           </Routes>
         </main>
-
-
-
       </div>
     </Router>
   );

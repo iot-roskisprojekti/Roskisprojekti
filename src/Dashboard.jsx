@@ -7,8 +7,6 @@ export default function Dashboard({ containers, tasks }) {
   const warningBins = containers.filter(bin => bin.fillLevel >= 70 && bin.fillLevel < 85);
   const normalBins = containers.filter(bin => bin.fillLevel < 70);
 
-  
-
   const renderBinsColumn = (bins) => (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "center" }}>
       {bins.map(bin => (

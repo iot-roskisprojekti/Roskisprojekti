@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Tasks({ tasks, onCompleteTask }) {
-  
+
   if (!tasks || tasks.length === 0) {
     return <p style={{ textAlign: "center" }}>Ei avoimia tehtäviä</p>;
   }
@@ -42,8 +42,8 @@ export default function Tasks({ tasks, onCompleteTask }) {
                 cursor: "pointer",
               }}
               onClick={() =>
-    onCompleteTask(task.id, task.containerId)
-  }
+                onCompleteTask(task.id, task.containerId)
+              }
             >
               Kuittaa
             </button>
