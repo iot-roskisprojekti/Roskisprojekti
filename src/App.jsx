@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -24,6 +24,38 @@ export default function App() {
   ]);
 
   
+useEffect(() => {
+  setTasks(prevTasks => {
+
+    const updatedTasks = [...prevTasks];
+
+    containers.forEach(container => {
+
+      if (container.fillLevel >= 70) {
+
+        const exists = updatedTasks.some(
+          task => task.containerId === container.id
+        );
+
+        if (!exists) {
+          updatedTasks.push({
+            id: "auto-" + container.id,
+            containerId: container.id,
+            containerName: container.location,
+            alertLevel: container.fillLevel,
+            priority:
+              container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
+            assignedTo: "Ei osoitettu"
+          });
+        }
+      }
+
+    });
+
+    return updatedTasks;
+
+  });
+}, [containers]);
 
 
 
