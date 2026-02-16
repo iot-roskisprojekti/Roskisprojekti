@@ -6,10 +6,12 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 import Dashboard from "./Dashboard";
 import Tasks from "./Tasks";
+import Containers from "./Containers";
+
 import Reports from "./Reports";
 
 export default function App() {
-  const [containers] = useState([
+  const [containers, setContainers] = useState([
     { id: "1", location: "Nilsiä", fillLevel: 45, capacity: 100, status: "normal", lastUpdate: "10:30", isOnline: true },
     { id: "2", location: "Nurmes", fillLevel: 70, capacity: 120, status: "warning", lastUpdate: "10:25", isOnline: true },
     { id: "3", location: "Sonkajärvi", fillLevel: 95, capacity: 150, status: "critical", lastUpdate: "10:20", isOnline: true },
@@ -73,6 +75,7 @@ const [lastTask, setLastTask] = useState(null);
           <Routes>
             <Route path="/" element={<Dashboard containers={containers} tasks={tasks} createTask={createTask} />} />
             <Route path="/tehtavat" element={<Tasks tasks={tasks} />} />
+            <Route   path="/sailiot"   element={<Containers containers={containers} />} />
             <Route path="/raportit" element={<Reports containers={containers} tasks={tasks} />} />
           </Routes>
         </main>
