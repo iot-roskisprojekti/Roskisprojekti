@@ -27,6 +27,8 @@ export default function Dashboard({ containers, tasks, createTask }) {
     </div>
   );
 
+  const totalBins = containers.length;
+
   return (
     <div style={{ padding: "20px" }}>
       <h2 className="text-center mb-4">Tilannekuva</h2>
@@ -39,19 +41,25 @@ export default function Dashboard({ containers, tasks, createTask }) {
       }}>
         {/* 🔴 Kriittiset vasemmalla */}
         <div>
-          <h3 style={{ color: "red", textAlign: "center" }}>Kriittiset</h3>
+          <h3 style={{ color: "red", textAlign: "center" }}>
+            Kriittiset ({criticalBins.length}/{totalBins})
+          </h3>
           {criticalBins.length > 0 ? renderBinsColumn(criticalBins) : <p>Ei kriittisiä säiliöitä</p>}
         </div>
 
         {/* 🟠 Varoitustason säiliöt keskellä */}
         <div>
-          <h3 style={{ color: "orange", textAlign: "center" }}>Varoitustason säiliöt</h3>
+          <h3 style={{ color: "orange", textAlign: "center" }}>
+            Varoitustason säiliöt ({warningBins.length}/{totalBins})
+          </h3>
           {warningBins.length > 0 ? renderBinsColumn(warningBins) : <p>Ei varoitustason säiliöitä</p>}
         </div>
 
         {/* 🟢 Normaalit oikealla */}
         <div>
-          <h3 style={{ color: "green", textAlign: "center" }}>Normaalit</h3>
+          <h3 style={{ color: "green", textAlign: "center" }}>
+            Normaalit ({normalBins.length}/{totalBins})
+          </h3>
           {normalBins.length > 0 ? renderBinsColumn(normalBins) : <p>Ei normaaleja säiliöitä</p>}
         </div>
       </div>
