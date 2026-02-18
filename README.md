@@ -1,5 +1,5 @@
 # Roskisprojekti 
-Ohjelmistotuotanto 2 ryhmäprojeki
+Ohjelmistotuotanto 2 ryhmäprojekti
 
 ## Frontend
 Reactilla (Vite) toteutettu frontend roskasäiliön IoT-seurantaprojektiin.  
@@ -40,5 +40,6 @@ Kloonaa repositorio omalle koneellesi:
 
 Käyttöliittymä avautuu selaimeen osoitteeseen, jonka Vite tulostaa terminaaliin, yleensä:
 `http://localhost:xxxx`
+
 
 
