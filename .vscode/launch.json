@@ -21,7 +21,7 @@
     },
     {
       "type": "node",
-      "name": "Launch: frontend",
+      "name": "Launch: frontend (on dev cont)",
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
@@ -32,11 +32,7 @@
   "compounds": [
     {
     "name": "Full Stack (on dev cont)",
-    "configurations": ["Launch: backend (on dev cont)", "Launch: frontend"]
-    },
-        {
-    "name": "Full Stack (on host)",
-    "configurations": ["Launch: backend (on host)", "Launch: frontend"]
+    "configurations": ["Launch: backend (on dev cont)", "Launch: frontend (on dev cont)"]
     }
   ]
 }
