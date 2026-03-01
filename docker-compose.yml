@@ -28,15 +28,15 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - "${DB_PORT}:3306"
+      - "${HOST_DB_PORT}:3306"
     networks:
       - roskis_net
 
   mqtt:
     image: eclipse-mosquitto:2.0.18
     ports:
-      - "${MQTT_PORT}:1883"
-      - "${MQTT_WS_PORT}:9001"
+      - "${HOST_MQTT_PORT}:1883"
+      - "${HOST_MQTT_WS_PORT}:9001"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
