@@ -7,7 +7,10 @@ services:
       - .env
     ports:
       - "8080:8080"  
+    volumes:
+      - ./backend/src/main/resources/application-docker.properties:/app/config/application-docker.properties
     environment:
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/app/config/
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       db:
@@ -18,6 +21,10 @@ services:
       - roskis_net        
   db:
     image: mysql:8.0.36
+    command: 
+      - "--bind-address=0.0.0.0"
+      - "--skip-name-resolve"
+      - "--log-error-verbosity=1"
     env_file: .env
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASS}
@@ -43,13 +50,13 @@ services:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
-    restart: always
     networks:
       - roskis_net
 
 networks:
   roskis_net:
     driver: bridge
+
 
 volumes:
   roskis_mysql_data:
