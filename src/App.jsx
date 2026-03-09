@@ -104,7 +104,7 @@ export default function App() {
 
       //  TÄHÄN TULEE BACKEND-KUTSU
       /*
-      const controller = new AbortController();
+    const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch("http://localhost:8080/api/containers", {
