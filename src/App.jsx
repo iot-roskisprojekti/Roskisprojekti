@@ -94,7 +94,7 @@ export default function App() {
     });
   };
 
-  //  Päivitys – SIMULOI TÄYTTÖASTETTA
+  //  Päivitys – SIMULOI TÄYTTÖASTETTA TÄLLÄ HETKELLÄ
   const refreshContainers = async () => {
 
     setLoading(true);
@@ -105,26 +105,30 @@ export default function App() {
       //  TÄHÄN TULEE BACKEND-KUTSU
       /*
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch("http://localhost:8080/api/containers", {
-        signal: controller.signal
-      });
+    const response = await fetch("http://localhost:8080/api/containers", {
+      signal: controller.signal
+    });
 
-      clearTimeout(timeoutId);
+    clearTimeout(timeoutId);
 
-      if (!response.ok) throw new Error("Palvelinvirhe");
+    if (!response.ok) throw new Error("Palvelinvirhe");
 
-      const data = await response.json();
-      setContainers(data);
+    const data = await response.json();
 
-      const offlineCount = data.filter(c => !c.isOnline).length;
+    const mapped = data.map(c => ({
+      id: c.id.toString(),
+      location: c.name,
+      fillLevel: c.fillPercent,
+      capacity: 100,
+      status: c.fillPercent >= 85 ? "critical" :
+              c.fillPercent >= 70 ? "warning" : "normal",
+      lastUpdate: new Date(c.lastUpdated).toLocaleTimeString(),
+      isOnline: true
+    }));
 
-      if (offlineCount === data.length) setSystemStatus("offline");
-      else if (offlineCount > 0) setSystemStatus("degraded");
-      else setSystemStatus("online");
-
-      return;
+    setContainers(mapped);
       */
 
       //  NYKYINEN SIMULAATIO (poistetaan kun backend valmis)
