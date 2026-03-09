@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.model.dto.SiteDto;
 import org.example.model.entity.MeasurementEntity;
 import org.example.model.entity.SiteEntity;
-import org.example.model.mapper.SiteMapper;
+import org.example.mapper.SiteMapper;
 import org.example.repository.MeasurementRepository;
 import org.example.repository.SiteRepository;
 import org.springframework.stereotype.Service;

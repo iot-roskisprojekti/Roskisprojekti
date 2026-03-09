@@ -1,4 +1,4 @@
-package org.example.model.mapper;
+package org.example.mapper;
 
 import org.example.model.dto.SiteDto;
 import org.example.model.entity.MeasurementEntity;
