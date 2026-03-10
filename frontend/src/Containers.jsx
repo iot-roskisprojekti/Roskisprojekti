@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Containers({ containers, setContainers }) {
   const [editingId, setEditingId] = useState(null);
@@ -12,12 +12,16 @@ export default function Containers({ containers, setContainers }) {
     lastUpdate: "00:00",
   });
 
+  
+
+ 
   // Aloita muokkaus
   const startEditing = (container) => {
     setEditingId(container.id);
     setEditedData(container);
   };
 
+  
   // Muokkauslomakkeen kenttien muutokset
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -27,8 +31,32 @@ export default function Containers({ containers, setContainers }) {
     });
   };
 
+ 
   // Tallenna muokkaukset
-  const saveChanges = () => {
+  const saveChanges = async () => {
+    // Kommentoi tämä auki backendille
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/sites/${editingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editedData.location,
+          capacity: editedData.capacity
+        })
+      });
+      if (!response.ok) throw new Error("Muokkaus epäonnistui");
+      const updated = await response.json();
+      setContainers(containers.map(c => c.id === editingId ? {
+        ...c,
+        location: updated.name,
+        capacity: updated.capacity
+      } : c));
+    } catch (error) {
+      console.error("Muokkaus epäonnistui:", error);
+    }
+    
+    // Tällä hetkellä vain front-end päivitys
     const updated = containers.map((c) =>
       c.id === editingId ? editedData : c
     );
@@ -36,13 +64,29 @@ export default function Containers({ containers, setContainers }) {
     setEditingId(null);
   };
 
+ 
   // Poista säiliö
-  const deleteContainer = (id) => {
-    if (window.confirm("Haluatko varmasti poistaa säiliön?")) {
-      setContainers(containers.filter((c) => c.id !== id));
+  const deleteContainer = async (id) => {
+    if (!window.confirm("Haluatko varmasti poistaa säiliön?")) return;
+
+    // Kommentoi tämä auki backendille
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/sites/${id}`, {
+        method: "DELETE"
+      });
+      if (!response.ok) throw new Error("Poisto epäonnistui");
+      setContainers(containers.filter(c => c.id !== id));
+    } catch (error) {
+      console.error("Säiliön poisto epäonnistui:", error);
     }
+    
+
+    // Tällä hetkellä vain front-end poisto
+    setContainers(containers.filter((c) => c.id !== id));
   };
 
+  
   // Uuden säiliön lomakekenttien muutos
   const handleNewChange = (e) => {
     const { name, value, type } = e.target;
@@ -52,12 +96,37 @@ export default function Containers({ containers, setContainers }) {
     });
   };
 
+ 
   // Lisää uusi säiliö
-  const addContainer = () => {
+  const addContainer = async () => {
     if (!newContainer.location) {
       alert("Sijainti on pakollinen");
       return;
     }
+
+    // Kommentoi tämä auki backendille
+    
+    try {
+      const response = await fetch("http://localhost:8080/api/sites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newContainer.location,
+          capacity: newContainer.capacity
+        })
+      });
+      if (!response.ok) throw new Error("Lisäys epäonnistui");
+      const saved = await response.json();
+      setContainers([...containers, {
+        ...newContainer,
+        id: saved.id.toString()
+      }]);
+    } catch (error) {
+      console.error("Säiliön lisäys epäonnistui:", error);
+    }
+    
+
+    // Tällä hetkellä vain front-end lisäys
     const id = (Math.max(...containers.map(c => Number(c.id))) + 1).toString();
     setContainers([...containers, { ...newContainer, id }]);
     setNewContainer({
@@ -70,20 +139,19 @@ export default function Containers({ containers, setContainers }) {
     });
   };
 
+  
   // Käännä status suomeksi
   const translateStatus = (status) => {
     switch (status) {
-      case "normal":
-        return "Normaali";
-      case "warning":
-        return "Varoitus";
-      case "critical":
-        return "Kriittinen";
-      default:
-        return status;
+      case "normal": return "Normaali";
+      case "warning": return "Varoitus";
+      case "critical": return "Kriittinen";
+      default: return status;
     }
   };
 
+
+  // JSX
   return (
     <div style={{ padding: "20px" }}>
       <h2>Säiliöiden hallinta</h2>
