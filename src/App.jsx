@@ -11,6 +11,7 @@ import Reports from "./Reports";
 
 export default function App() {
 
+  // Fallback data jos api ei vastaa (=ei tärkeä säilyttää)
   const [containers, setContainers] = useState([
     { id: "1", location: "Nilsiä", fillLevel: 45, capacity: 100, status: "normal", lastUpdate: "10:30", isOnline: true },
     { id: "2", location: "Nurmes", fillLevel: 70, capacity: 120, status: "warning", lastUpdate: "10:25", isOnline: true },
