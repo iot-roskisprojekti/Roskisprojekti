@@ -28,8 +28,8 @@ export default function App() {
   const [systemStatus, setSystemStatus] = useState("online"); 
   // online | degraded | offline
   const [errorMessage, setErrorMessage] = useState(null);
-  const [systemOffline, setSystemOffline] = useState(false);
-  const [systemError, setSystemError] = useState(null);
+  //const [systemOffline, setSystemOffline] = useState(false);
+  //const [systemError, setSystemError] = useState(null);
 
 
   //  Automaattinen tehtävälogiikka
@@ -202,8 +202,6 @@ export default function App() {
                 loading={loading}
                 systemStatus={systemStatus}
                 errorMessage={errorMessage}
-                systemOffline={systemOffline}
-                systemError={systemError}
               />
             } />
             <Route path="/sailiot" element={

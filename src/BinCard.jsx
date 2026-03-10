@@ -61,7 +61,7 @@ export default function BinCard({ id, location, fillLevel, capacity, lastUpdate,
           color: "#007bff",
           fontWeight: "bold"
         }}>
-          🔧 Tyhjennys tilattu
+          🚛 Tyhjennys tilattu
         </div>
       )}
 
