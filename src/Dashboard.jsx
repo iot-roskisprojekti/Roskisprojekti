@@ -58,7 +58,7 @@ export default function Dashboard({
         </div>
       )}
 
-      {systemStatus !== "offline" && errorMessage && (
+      {systemStatus !== "offline" && ErrorMessage && (
         <div className="alert alert-warning text-center">
           <strong>Yhteysvirhe:</strong> {ErrorMessage}
         </div>
