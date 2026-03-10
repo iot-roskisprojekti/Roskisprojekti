@@ -5,8 +5,8 @@ export default function Dashboard({
   containers = [],
   tasks = [],
   onRefresh,
-  systemOffline,
-  systemError
+  systemStatus,
+  ErrorMessage
 }) {
 
   const criticalBins = containers.filter(bin => bin.fillLevel >= 85);
@@ -51,16 +51,16 @@ export default function Dashboard({
       
       {/*  DATAYHTEYS-HÄLYTYKSET */}
       
-      {systemOffline && (
+      {systemStatus === "offline" &&  (
         <div className="alert alert-danger text-center">
           <strong>JÄRJESTELMÄ OFFLINE</strong><br />
           Yhteys backend-palvelimeen katkennut.
         </div>
       )}
 
-      {!systemOffline && systemError && (
+      {systemStatus !== "offline" && errorMessage && (
         <div className="alert alert-warning text-center">
-          <strong>Yhteysvirhe:</strong> {systemError}
+          <strong>Yhteysvirhe:</strong> {ErrorMessage}
         </div>
       )}
 

@@ -16,17 +16,10 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     }
   }, [containers]);
 
-  if (!containers || containers.length === 0) {
-    return <p>Ei säiliödataa</p>;
-  }
+  if (!containers || containers.length === 0) return <p>Ei säiliödataa</p>;
+  if (!selectedContainer) return <p>Ladataan...</p>;
 
-  if (!selectedContainer) {
-    return <p>Ladataan...</p>;
-  }
-
-
-  /* SIMULAATIO (POISTA BACKENDIN TULLESSA) */
-
+  /* SIMULAATIO (POISTA TAI KOMMENTOI TÄMÄ BACKENDIN TULLESSA) */
   const generateDailyHistory = (fillLevel) => {
     const days = 14;
     let history = [];
@@ -62,21 +55,47 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     return history;
   };
 
-  
   /* HISTORIAN LATAUS (BACKEND READY) */
-  
   useEffect(() => {
-
     if (!selectedContainer) return;
 
-    // Backend tulee palauttamaan nämä kentät:
-    // selectedContainer.history
-    // selectedContainer.emptyHistory
+    // -----------------------------
+    // Backend-kutsu, kommentoitu nyt
+    // -----------------------------
+    /*
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/containers/${selectedContainer.id}/history`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) throw new Error("Palvelinvirhe");
+
+        const data = await response.json();
+        setContainerHistory(data.history);
+        setEmptyHistory(data.emptyHistory);
+
+      } catch (error) {
+        console.error(error);
+        // fallback simulaatio
+        setContainerHistory(generateDailyHistory(selectedContainer.fillLevel));
+        setEmptyHistory(generateEmptyHistory());
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    fetchHistory();
+    */
+
+    //  SIMULAATIO Fallback (=näyttää random lukemia jos backend ei toimi, eli turha käytännössä)
     setContainerHistory(
       selectedContainer.history || generateDailyHistory(selectedContainer.fillLevel)
     );
-
     setEmptyHistory(
       selectedContainer.emptyHistory || generateEmptyHistory()
     );
@@ -84,74 +103,54 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   }, [selectedContainer]);
 
 
-  /* RAPORTOINTILASKENNAT */
 
+  
+  /* RAPORTOINTILASKENNAT */
   const fillLevels = containerHistory.map(h => h.fillLevel);
   const averageFill = fillLevels.length
     ? Math.round(fillLevels.reduce((sum, val) => sum + val, 0) / fillLevels.length)
     : 0;
-
   const maxFill = fillLevels.length ? Math.max(...fillLevels) : 0;
   const minFill = fillLevels.length ? Math.min(...fillLevels) : 0;
   const criticalDays = fillLevels.filter(val => val > 80).length;
-
   const emptiedDays = emptyHistory.filter(h => h.emptied).length;
+  const alertCount = containerHistory.filter(h => h.fillLevel >= 70).length;
 
-  // Hälytysten määrä (warning + critical)
-  const alertCount = containerHistory.filter(
-    h => h.fillLevel >= 70
-  ).length;
-
-
-  /* TYÖTEHTÄVIEN KÄSITTELYAIKA */
-
-  // Suodata vain valitun säiliön suoritetut tehtävät
-const filteredCompletedTasks = completedTasks.filter(
-  task => task.containerId === selectedContainer.id
-);
-
-  const averageHandlingTime = (() => {
-
-  const tasksWithTime = filteredCompletedTasks.filter(
-    t => t.createdAt && t.completedAt
+  // Työtehtävien käsittelyaika valitulle säiliölle
+  const filteredCompletedTasks = completedTasks.filter(
+    task => task.containerId === selectedContainer.id
   );
 
-  if (tasksWithTime.length === 0) return null;
+  const averageHandlingTime = (() => {
+    const tasksWithTime = filteredCompletedTasks.filter(
+      t => t.createdAt && t.completedAt
+    );
 
-  const totalMs = tasksWithTime.reduce((sum, task) => {
-    const created = new Date(task.createdAt);
-    const completed = new Date(task.completedAt);
-    return sum + (completed - created);
-  }, 0);
+    if (tasksWithTime.length === 0) return null;
 
-  const avgMs = totalMs / tasksWithTime.length;
+    const totalMs = tasksWithTime.reduce((sum, task) => {
+      const created = new Date(task.createdAt);
+      const completed = new Date(task.completedAt);
+      return sum + (completed - created);
+    }, 0);
 
-  const totalMinutes = Math.floor(avgMs / (1000 * 60));
+    const avgMs = totalMs / tasksWithTime.length;
+    const totalMinutes = Math.floor(avgMs / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
 
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
+    let result = "";
+    if (days > 0) result += `${days} pv `;
+    if (hours > 0) result += `${hours} h `;
+    if (minutes > 0 || result === "") result += `${minutes} min`;
+    return result.trim();
+  })();
 
-  let result = "";
-
-  if (days > 0) result += `${days} pv `;
-  if (hours > 0) result += `${hours} h `;
-  if (minutes > 0 || result === "") result += `${minutes} min`;
-
-  return result.trim();
-
-})();
-
-
- 
   /* UI */
-
   return (
     <section className="p-6 flex flex-col items-center space-y-6">
-
-      <h2 className="text-2xl font-bold text-center mb-4">
-        Raportointi
-      </h2>
+      <h2 className="text-2xl font-bold text-center mb-4">Raportointi</h2>
 
       {/* Säiliön valinta */}
       <div className="w-full max-w-md p-4 bg-white rounded shadow text-center">
@@ -159,9 +158,7 @@ const filteredCompletedTasks = completedTasks.filter(
         <select
           value={selectedContainer?.id || ""}
           onChange={(e) => {
-            const found = containers.find(
-              c => c.id === e.target.value
-            );
+            const found = containers.find(c => c.id === e.target.value);
             if (found) setSelectedContainer(found);
           }}
           className="border px-2 py-1 rounded"
@@ -176,41 +173,27 @@ const filteredCompletedTasks = completedTasks.filter(
 
       {/* Trendikaavio */}
       <div className="w-full max-w-3xl p-4 bg-white rounded shadow">
-        <h3 className="font-semibold mb-4 text-center">
-          Täyttöasteen trendi (14 pv)
-        </h3>
-
+        <h3 className="font-semibold mb-4 text-center">Täyttöasteen trendi (14 pv)</h3>
         <LineChart width={600} height={300} data={containerHistory}>
           <XAxis dataKey="timestamp" />
           <YAxis unit="%" domain={[0, 100]} />
           <Tooltip />
           <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-          <Line
-            type="monotone"
-            dataKey="fillLevel"
-            stroke="#646cff"
-          />
+          <Line type="monotone" dataKey="fillLevel" stroke="#646cff" />
         </LineChart>
       </div>
 
       {/* Tilastoanalyysi */}
       <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
-        <h3 className="font-semibold mb-2">
-          {selectedContainer.location} – analyysi
-        </h3>
-
+        <h3 className="font-semibold mb-2">{selectedContainer.location} – analyysi</h3>
         <p>Keskimääräinen täyttöaste: {averageFill}%</p>
         <p>Minimi: {minFill}%</p>
         <p>Maksimi: {maxFill}%</p>
         <p>Kriittiset päivät: {criticalDays}</p>
         <p>Hälytyksiä yhteensä: {alertCount}</p>
         <p>Tyhjennykset (14 pv): {emptiedDays}</p>
-
-        {averageHandlingTime && (
-          <p>Keskimääräinen käsittelyaika: {averageHandlingTime} h</p>
-        )}
+        {averageHandlingTime && <p>Keskimääräinen käsittelyaika: {averageHandlingTime} h</p>}
       </div>
-
     </section>
   );
 }
