@@ -12,9 +12,7 @@ export default function Dashboard({
   const criticalBins = containers.filter(bin => bin.fillLevel >= 85);
   const warningBins = containers.filter(bin => bin.fillLevel >= 70 && bin.fillLevel < 85);
   const normalBins = containers.filter(bin => bin.fillLevel < 70);
-
-  const offlineBins = containers.filter(bin => !bin.isOnline);
-
+  const offlineBins = containers.filter(bin => bin.isOnline === false);
   const totalBins = containers.length;
 
   const renderBinsColumn = (bins) => (
