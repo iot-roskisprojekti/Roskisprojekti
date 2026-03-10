@@ -1,22 +1,25 @@
 package org.example.controller;
 
+import java.util.List;
+
 import org.example.model.dto.MeasurementDto;
 import org.example.service.MeasurementService;
 import org.springframework.web.bind.annotation.*;
-/**
- * Tämä nyt on vedetty vaan tänne RestControllerina
- * */
+
+
 @RestController
 @RequestMapping("/api/measurements")
+@CrossOrigin(origins = "http://localhost:5173")
 public class MeasurementController {
-    private final MeasurementService service;
+    private final MeasurementService measurementService;
 
-    public MeasurementController(MeasurementService service) {
-        this.service = service;
+    public MeasurementController(MeasurementService measurementService) {
+        this.measurementService = measurementService;
     }
 
-    @PostMapping
-    public void receive(@RequestBody MeasurementDto dto) {
-        service.processTelemetry(dto);
+    @GetMapping
+    public List<MeasurementDto> getAllMeasurements() {
+        return measurementService.getAllMeasurements();
     }
+
 }

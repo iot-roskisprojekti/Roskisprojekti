@@ -62,7 +62,6 @@ public class MqttConfig {
 
                 MeasurementDto dto = objectMapper.readValue(payload, MeasurementDto.class);
 
-                System.out.println("DEBUG: Parsed Bin ID -> " + dto.binId());
 
                 measurementService.processTelemetry(dto);
             } catch (Exception e) {

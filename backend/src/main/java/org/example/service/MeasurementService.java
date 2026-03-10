@@ -1,13 +1,12 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.example.model.dto.MeasurementDto;
-import org.example.model.entity.AlertEntity;
 import org.example.model.entity.MeasurementEntity;
 import org.example.model.entity.SiteEntity;
-import org.example.model.entity.TaskEntity;
-import org.example.model.enums.AlertState;
-import org.example.model.enums.AlertType;
 import org.example.repository.AlertRepository;
 import org.example.repository.MeasurementRepository;
 import org.example.repository.SiteRepository;
@@ -23,21 +22,36 @@ public class MeasurementService {
     private final AlertRepository alertRepository;
     private final TaskRepository taskRepository;
 
+
+    @Transactional
+    public List<MeasurementDto> getAllMeasurements() {
+        List<MeasurementEntity> measurements = measurementRepository.findAll();
+        //Todo: käy läpi jokainen measurements listan MeasurementEntity
+        // Muunna MeasurementEntity -> MeasurementDto
+        // Muunna (tarvittaessa) MeasuremenEntityn kentän datatyyppi MeasurementDto odottamaan muotoon
+        // Lisää MeasurementDto palautettavaan listaan
+
+        return List.of();
+    }
+
+
     @Transactional
     public void processTelemetry(MeasurementDto dto) {
-        SiteEntity site = siteRepository.findById(dto.binId())
-                .orElseThrow(() -> new RuntimeException("Site not found for ID: " + dto.binId()));
+        SiteEntity site = siteRepository.findById(dto.siteId())
+                .orElseThrow(() -> new RuntimeException("Site not found for ID: " + dto.siteId()));
 
         MeasurementEntity measurement = new MeasurementEntity();
         measurement.setSiteEntity(site);
         
-        measurement.setFillPercent(java.math.BigDecimal.valueOf(dto.fillLevel()));
+        measurement.setFillPercent(java.math.BigDecimal.valueOf(dto.fillPercent()));
         
-        measurement.setMeasuredAt(java.time.Instant.ofEpochSecond(dto.timestamp()));
+        measurement.setMeasuredAt(java.time.Instant.ofEpochSecond(dto.measuredAt()));
 
         measurementRepository.save(measurement); //Maagisesti kirjoittaa tietokantaan. Simsalabim.
 
     }
+
+
 
 
 }

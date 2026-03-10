@@ -8,7 +8,7 @@
       "mainClass": "org.example.RoskisposkisApplication",
       "projectName": "roskisposkis",
       "envFile": "${workspaceFolder}/.env",
-      "vmArgs": "-Dspring.profiles.active=host"
+      "vmArgs": ""
     },
         {
       "type": "java",
