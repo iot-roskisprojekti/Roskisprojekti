@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Containers({ containers, setContainers }) {
   const [editingId, setEditingId] = useState(null);
@@ -9,19 +9,15 @@ export default function Containers({ containers, setContainers }) {
     capacity: 100,
     status: "normal",
     isOnline: true,
-    lastUpdate: "00:00",
+    lastUpdate: new Date().toLocaleTimeString(),
   });
 
-  
-
- 
   // Aloita muokkaus
   const startEditing = (container) => {
     setEditingId(container.id);
-    setEditedData(container);
+    setEditedData({ ...container });
   };
 
-  
   // Muokkauslomakkeen kenttien muutokset
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -31,63 +27,55 @@ export default function Containers({ containers, setContainers }) {
     });
   };
 
- 
-  // Tallenna muokkaukset
+  // Tallenna muokkaukset backendille
   const saveChanges = async () => {
-    // Kommentoi tämä auki backendille
-    
     try {
       const response = await fetch(`http://localhost:8080/api/sites/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: editedData.location,
-          capacity: editedData.capacity
-        })
+          capacity: editedData.capacity,
+        }),
       });
+
       if (!response.ok) throw new Error("Muokkaus epäonnistui");
+
+      // Backend palauttaa päivitetyn objektin
       const updated = await response.json();
-      setContainers(containers.map(c => c.id === editingId ? {
-        ...c,
-        location: updated.name,
-        capacity: updated.capacity
-      } : c));
+
+      setContainers(containers.map(c =>
+        c.id === editingId
+          ? { ...c, location: updated.name, capacity: updated.capacity }
+          : c
+      ));
     } catch (error) {
       console.error("Muokkaus epäonnistui:", error);
+      alert("Muokkaus epäonnistui. Tarkista backend.");
+    } finally {
+      setEditingId(null);
     }
-    
-    // Tällä hetkellä vain front-end päivitys
-    const updated = containers.map((c) =>
-      c.id === editingId ? editedData : c
-    );
-    setContainers(updated);
-    setEditingId(null);
   };
 
- 
-  // Poista säiliö
+  // Poista säiliö backendistä
   const deleteContainer = async (id) => {
     if (!window.confirm("Haluatko varmasti poistaa säiliön?")) return;
 
-    // Kommentoi tämä auki backendille
-    
     try {
       const response = await fetch(`http://localhost:8080/api/sites/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
       if (!response.ok) throw new Error("Poisto epäonnistui");
+
+      // Poista frontendistä vasta backendin jälkeen
       setContainers(containers.filter(c => c.id !== id));
     } catch (error) {
-      console.error("Säiliön poisto epäonnistui:", error);
+      console.error("Poisto epäonnistui:", error);
+      alert("Poisto epäonnistui. Tarkista backend.");
     }
-    
-
-    // Tällä hetkellä vain front-end poisto
-    setContainers(containers.filter((c) => c.id !== id));
   };
 
-  
-  // Uuden säiliön lomakekenttien muutos
+  // Muutos uuteen säiliöön
   const handleNewChange = (e) => {
     const { name, value, type } = e.target;
     setNewContainer({
@@ -96,50 +84,45 @@ export default function Containers({ containers, setContainers }) {
     });
   };
 
- 
-  // Lisää uusi säiliö
+  // Lisää uusi säiliö backendille
   const addContainer = async () => {
     if (!newContainer.location) {
       alert("Sijainti on pakollinen");
       return;
     }
 
-    // Kommentoi tämä auki backendille
-    
     try {
       const response = await fetch("http://localhost:8080/api/sites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newContainer.location,
-          capacity: newContainer.capacity
-        })
+          capacity: newContainer.capacity,
+        }),
       });
+
       if (!response.ok) throw new Error("Lisäys epäonnistui");
+
       const saved = await response.json();
+
       setContainers([...containers, {
         ...newContainer,
-        id: saved.id.toString()
+        id: saved.id.toString(),
       }]);
+      setNewContainer({
+        location: "",
+        fillLevel: 0,
+        capacity: 100,
+        status: "normal",
+        isOnline: true,
+        lastUpdate: new Date().toLocaleTimeString(),
+      });
     } catch (error) {
-      console.error("Säiliön lisäys epäonnistui:", error);
+      console.error("Lisäys epäonnistui:", error);
+      alert("Lisäys epäonnistui. Tarkista backend.");
     }
-    
-
-    // Tällä hetkellä vain front-end lisäys
-    const id = (Math.max(...containers.map(c => Number(c.id))) + 1).toString();
-    setContainers([...containers, { ...newContainer, id }]);
-    setNewContainer({
-      location: "",
-      fillLevel: 0,
-      capacity: 100,
-      status: "normal",
-      isOnline: true,
-      lastUpdate: "00:00",
-    });
   };
 
-  
   // Käännä status suomeksi
   const translateStatus = (status) => {
     switch (status) {
@@ -149,7 +132,6 @@ export default function Containers({ containers, setContainers }) {
       default: return status;
     }
   };
-
 
   // JSX
   return (
