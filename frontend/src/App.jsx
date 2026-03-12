@@ -99,9 +99,8 @@ export default function App() {
 
       //  Simulaatio satunnaisella täyttöasteen muutoksella
       const simulated = data.map(c => {
-        const randomChange = Math.floor(Math.random() * 20) - 5;
-        let newFill = c.fillPercent + randomChange;
-        newFill = Math.max(0, Math.min(100, newFill));
+        const randomIncrease = Math.floor(Math.random() * 10); // 0–9%
+         let newFill = Math.min(c.fillPercent + randomIncrease, 100); // ei yli 100%
 
         //  Lähetetään backendille päivitys
         fetch(`http://localhost:8080/api/sites/${c.id}`, {
