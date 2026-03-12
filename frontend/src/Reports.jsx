@@ -10,6 +10,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   const [containerHistory, setContainerHistory] = useState([]);
   const [emptyHistory, setEmptyHistory] = useState([]);
 
+  // Päivitä valittu säiliö, kun containers muuttuu
   useEffect(() => {
     if (containers.length > 0) {
       setSelectedContainer(containers[0]);
@@ -19,8 +20,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   if (!containers || containers.length === 0) return <p>Ei säiliödataa</p>;
   if (!selectedContainer) return <p>Ladataan...</p>;
 
-  /* SIMULAATIO (POISTA TAI KOMMENTOI TÄMÄ BACKENDIN TULLESSA) */
-  
+  // Simulaatio vain fallbackiksi
   const generateDailyHistory = (fillLevel) => {
     const days = 14;
     let history = [];
@@ -56,14 +56,10 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     return history;
   };
 
-  /* HISTORIAN LATAUS (BACKEND READY) */
+  // Hae historia backendistä
   useEffect(() => {
     if (!selectedContainer) return;
 
-    // -----------------------------
-    // Backend-kutsu, kommentoitu nyt
-    // -----------------------------
-    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
@@ -81,8 +77,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
         setEmptyHistory(data.emptyHistory);
 
       } catch (error) {
-        console.error(error);
-        // fallback simulaatio
+        console.error("Backend-virhe, käytetään simulaatiota:", error);
         setContainerHistory(generateDailyHistory(selectedContainer.fillLevel));
         setEmptyHistory(generateEmptyHistory());
       } finally {
@@ -91,22 +86,10 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     };
 
     fetchHistory();
-    
-
-    //  SIMULAATIO Fallback (=näyttää random lukemia jos backend ei toimi, eli turha käytännössä)
-    setContainerHistory(
-      selectedContainer.history || generateDailyHistory(selectedContainer.fillLevel)
-    );
-    setEmptyHistory(
-      selectedContainer.emptyHistory || generateEmptyHistory()
-    );
 
   }, [selectedContainer]);
 
-
-
-  
-  /* RAPORTOINTILASKENNAT */
+  // Tilastolaskennat
   const fillLevels = containerHistory.map(h => h.fillLevel);
   const averageFill = fillLevels.length
     ? Math.round(fillLevels.reduce((sum, val) => sum + val, 0) / fillLevels.length)
@@ -148,7 +131,6 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     return result.trim();
   })();
 
-  /* UI */
   return (
     <section className="p-6 flex flex-col items-center space-y-6">
       <h2 className="text-2xl font-bold text-center mb-4">Raportointi</h2>
