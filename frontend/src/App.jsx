@@ -12,34 +12,15 @@ import Reports from "./Reports";
 export default function App() {
 
   const [containers, setContainers] = useState([]);
-  // Fallback data jos api ei vastaa (=ei tärkeä säilyttää)
-  {/*
-  const [containers, setContainers] = useState([
-    { id: "1", location: "Nilsiä", fillLevel: 45, capacity: 100, status: "normal", lastUpdate: "10:30", isOnline: true },
-    { id: "2", location: "Nurmes", fillLevel: 70, capacity: 120, status: "warning", lastUpdate: "10:25", isOnline: true },
-    { id: "3", location: "Sonkajärvi", fillLevel: 95, capacity: 150, status: "critical", lastUpdate: "10:20", isOnline: true },
-    { id: "4", location: "Kaavi", fillLevel: 30, capacity: 80, status: "normal", lastUpdate: "10:35", isOnline: true },
-    { id: "5", location: "Lieksa", fillLevel: 60, capacity: 100, status: "warning", lastUpdate: "10:28", isOnline: true },
-  ]);
-    */}
-  
-
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
-
-  useEffect(() => {
-  refreshContainers();
-}, []);
 
   //  Datakatkosvalmius
   const [loading, setLoading] = useState(false);
   const [systemStatus, setSystemStatus] = useState("online"); 
-  // online | degraded | offline
   const [errorMessage, setErrorMessage] = useState(null);
- 
 
-
-  //  Automaattinen tehtävälogiikka
+  //  Automaattinen tehtävälogiikka hälytyksistä
   useEffect(() => {
     setTasks(prevTasks => {
       let updatedTasks = [...prevTasks];
@@ -57,7 +38,7 @@ export default function App() {
               containerId: container.id,
               containerName: container.location,
               alertLevel: container.fillLevel,
-              priority:container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
+              priority: container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
               assignedTo: "Ei osoitettu",
               createdAt: new Date().toISOString() 
             });
@@ -102,7 +83,7 @@ export default function App() {
     });
   };
 
-  //  Päivitys – SIMULOI TÄYTTÖASTETTA TÄLLÄ HETKELLÄ
+  //  Päivitys – nappia painamalla
   const refreshContainers = async () => {
 
     setLoading(true);
@@ -110,71 +91,47 @@ export default function App() {
 
     try {
 
-      //  TÄHÄN TULEE BACKEND-KUTSU
-      
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+      //  Hae backendistä säiliöt
+      const response = await fetch("http://localhost:8080/api/sites");
+      if (!response.ok) throw new Error("Palvelinvirhe");
 
-    const response = await fetch("http://localhost:8080/api/sites", {
-      signal: controller.signal
-    });
+      const data = await response.json();
 
-    clearTimeout(timeoutId);
+      //  Simulaatio satunnaisella täyttöasteen muutoksella
+      const simulated = data.map(c => {
+        const randomChange = Math.floor(Math.random() * 20) - 5;
+        let newFill = c.fillPercent + randomChange;
+        newFill = Math.max(0, Math.min(100, newFill));
 
-    if (!response.ok) throw new Error("Palvelinvirhe");
+        //  Lähetetään backendille päivitys
+        fetch(`http://localhost:8080/api/sites/${c.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fillPercent: newFill })
+        }).catch(e => console.error("Virhe backend-päivityksessä:", e));
 
-    const data = await response.json();
+        return {
+          id: c.id.toString(),
+          location: c.name,
+          fillLevel: newFill,
+          capacity: 100,
+          status: newFill >= 85 ? "critical" :
+                  newFill >= 70 ? "warning" : "normal",
+          lastUpdate: new Date().toLocaleTimeString(),
+          isOnline: true
+        };
+      });
 
-    const mapped = data.map(c => ({
-      id: c.id.toString(),
-      location: c.name,
-      fillLevel: c.fillPercent,
-      capacity: 100,
-      status: c.fillPercent >= 85 ? "critical" :
-              c.fillPercent >= 70 ? "warning" : "normal",
-      lastUpdate: new Date(c.lastUpdated).toLocaleTimeString(),
-      isOnline: true
-    }));
-
-    setContainers(mapped);
-      
-
-      //  NYKYINEN SIMULAATIO (poistetaan kun backend valmis)
-      /*
-      setContainers(prevContainers =>
-        prevContainers.map(container => {
-
-          const randomChange = Math.floor(Math.random() * 20) - 5;
-          let newFill = container.fillLevel + randomChange;
-          newFill = Math.max(0, Math.min(100, newFill));
-
-          let newStatus = "normal";
-          if (newFill >= 85) newStatus = "critical";
-          else if (newFill >= 70) newStatus = "warning";
-
-          return {
-            ...container,
-            fillLevel: newFill,
-            status: newStatus,
-            lastUpdate: new Date().toLocaleTimeString()
-          };
-        })
-      );
-      */
-
+      setContainers(simulated);
       setSystemStatus("online");
 
     } catch (error) {
-
       setSystemStatus("offline");
       setErrorMessage("Yhteys palvelimeen katkennut");
-
     } finally {
       setLoading(false);
     }
   };
-
-
 
   return (
     <Router>
@@ -209,7 +166,7 @@ export default function App() {
               <Dashboard
                 containers={containers}
                 tasks={tasks}
-                onRefresh={refreshContainers}
+                onRefresh={refreshContainers} // <-- nappi Dashboardissa kutsuu tätä
                 loading={loading}
                 systemStatus={systemStatus}
                 errorMessage={errorMessage}
