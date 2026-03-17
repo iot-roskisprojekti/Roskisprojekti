@@ -3,6 +3,7 @@ import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { FaCog } from "react-icons/fa";
 
 import Dashboard from "./Dashboard";
 import Tasks from "./Tasks";
@@ -17,7 +18,7 @@ export default function App() {
 
   //  Datakatkosvalmius
   const [loading, setLoading] = useState(false);
-  const [systemStatus, setSystemStatus] = useState("online"); 
+  const [systemStatus, setSystemStatus] = useState("online");
   const [errorMessage, setErrorMessage] = useState(null);
 
   //  Automaattinen tehtävälogiikka hälytyksistä
@@ -40,7 +41,7 @@ export default function App() {
               alertLevel: container.fillLevel,
               priority: container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
               assignedTo: "Ei osoitettu",
-              createdAt: new Date().toISOString() 
+              createdAt: new Date().toISOString()
             });
           }
         }
@@ -100,7 +101,7 @@ export default function App() {
       //  Simulaatio satunnaisella täyttöasteen muutoksella
       const simulated = data.map(c => {
         const randomIncrease = Math.floor(Math.random() * 10); // 0–9%
-         let newFill = Math.min(c.fillPercent + randomIncrease, 100); // ei yli 100%
+        let newFill = Math.min(c.fillPercent + randomIncrease, 100); // ei yli 100%
 
         //  Lähetetään backendille päivitys
         fetch(`http://localhost:8080/api/sites/${c.id}`, {
@@ -115,7 +116,7 @@ export default function App() {
           fillLevel: newFill,
           capacity: 100,
           status: newFill >= 85 ? "critical" :
-                  newFill >= 70 ? "warning" : "normal",
+            newFill >= 70 ? "warning" : "normal",
           lastUpdate: new Date().toLocaleTimeString(),
           isOnline: true
         };
@@ -148,12 +149,41 @@ export default function App() {
                 <span className="navbar-toggler-icon"></span>
               </button>
               <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+                {/* Keskellä navigointi */}
                 <div className="navbar-nav justify-content-center w-100">
                   <Link className="nav-link mx-3" to="/">Tilannekuva</Link>
                   <Link className="nav-link mx-3" to="/tehtavat">Työtehtävät</Link>
                   <Link className="nav-link mx-3" to="/sailiot">Säiliöt</Link>
                   <Link className="nav-link mx-3" to="/raportit">Raportit</Link>
                 </div>
+
+                {/* Oikeaan reunaan asetukset */}
+                <div className="d-flex">
+                  <div className="dropdown">
+                    <button
+                      className="btn btn-link nav-link dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                    >
+                      <FaCog size={20} />
+                    </button>
+
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <Link className="dropdown-item" to="/asetukset/yhteystiedot">
+                          Ilmoitusten vastaanottajat
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="dropdown-item" to="/asetukset/halytysrajat">
+                          Hälytysrajat
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
               </div>
             </div>
           </nav>
