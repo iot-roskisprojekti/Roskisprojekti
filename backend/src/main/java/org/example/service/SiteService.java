@@ -20,6 +20,10 @@ public class SiteService {
     private final MeasurementRepository measurementRepository;
     private final SiteMapper siteMapper;
 
+    public void deleteSite(Long id) {
+        siteRepository.deleteById(id);
+    }
+
     public List<SiteDto> getAllSites() {
         List<SiteEntity> entities = siteRepository.findAll();
 
