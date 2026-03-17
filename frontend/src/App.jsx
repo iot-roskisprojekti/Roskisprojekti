@@ -9,6 +9,8 @@ import Dashboard from "./Dashboard";
 import Tasks from "./Tasks";
 import Containers from "./Containers";
 import Reports from "./Reports";
+import NotificationSettings from "./NotificationSettings";
+import AlertSettings from "./AlertSettings";
 
 export default function App() {
 
@@ -210,6 +212,8 @@ export default function App() {
             <Route path="/raportit" element={
               <Reports containers={containers} completedTasks={completedTasks} />
             } />
+            <Route path="/asetukset/yhteystiedot" element={<NotificationSettings />} />
+            <Route path="/asetukset/halytysrajat" element={<AlertSettings />} />
           </Routes>
         </main>
       </div>
