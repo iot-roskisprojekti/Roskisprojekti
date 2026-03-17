@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.model.dto.SiteDto;
 import org.example.service.SiteService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,13 @@ public class SiteController {
     public ResponseEntity<Void> deleteSite(@PathVariable Long id) {
         siteService.deleteSite(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping()
+    public ResponseEntity<SiteDto> addSite(@RequestBody SiteDto siteDto){
+
+
+        return new ResponseEntity<>(siteService.addSite(siteDto), HttpStatus.CREATED);
     }
 
 
