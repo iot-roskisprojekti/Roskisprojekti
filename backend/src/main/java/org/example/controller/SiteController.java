@@ -31,9 +31,14 @@ public class SiteController {
 
     @PostMapping()
     public ResponseEntity<SiteDto> addSite(@RequestBody SiteDto siteDto){
-
-
         return new ResponseEntity<>(siteService.addSite(siteDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+
+    public ResponseEntity<SiteDto> modifySite(@PathVariable Long id, @RequestBody SiteDto siteDto){
+
+        return new ResponseEntity<>(siteService.modifySite(id, siteDto), HttpStatus.OK);
     }
 
 

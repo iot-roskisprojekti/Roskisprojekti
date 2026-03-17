@@ -34,6 +34,17 @@ public class SiteService {
         ), null);
     }
 
+    @Transactional
+    public SiteDto modifySite(Long id, SiteDto siteDto) {
+
+        SiteEntity site = siteRepository.findById(id).orElseThrow();
+
+        site.setName(siteDto.name());
+        site.setLocation("?");
+
+        return siteMapper.toDto(siteRepository.save(site), null);
+    }
+
     public List<SiteDto> getAllSites() {
         List<SiteEntity> entities = siteRepository.findAll();
 
@@ -45,4 +56,7 @@ public class SiteService {
             return siteMapper.toDto(site, latest);
         }).toList();
     }
+
+
+
 }
