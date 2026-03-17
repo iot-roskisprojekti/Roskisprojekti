@@ -17,6 +17,10 @@ export default function App() {
   const [containers, setContainers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
+  const [alertSettings, setAlertSettings] = useState({
+    warningLevel: 70,
+    criticalLevel: 90,
+  });
 
   //  Datakatkosvalmius
   const [loading, setLoading] = useState(false);
@@ -213,7 +217,12 @@ export default function App() {
               <Reports containers={containers} completedTasks={completedTasks} />
             } />
             <Route path="/asetukset/yhteystiedot" element={<NotificationSettings />} />
-            <Route path="/asetukset/halytysrajat" element={<AlertSettings />} />
+            <Route path="/asetukset/halytysrajat" element={
+              <AlertSettings
+                alertSettings={alertSettings}
+                setAlertSettings={setAlertSettings}
+              />
+            } />
           </Routes>
         </main>
       </div>
