@@ -1,4 +1,6 @@
 package org.example.domain.bin;
+import org.example.domain.site.SiteId;
+
 
 public class Bin {
     private final BinId binId;
@@ -13,9 +15,57 @@ public class Bin {
         this.fillLevel = fillLevel;
     }
 
-
-    public void updateFillLevel(FillLevel newFillLevel){
-        this.fillLevel = newFillLevel;
+    //rosentteina 0-100
+    public void updateFillLevel(FillLevel percent){
+        this.fillLevel = percent;
     }
+
+
+    //Status (tarkista vielä prosentit ja tilat miten suunnitelmassa)
+
+    public BinStatus getStatus() {
+        double percent = fillLevel.percent();
+
+        if (percent >= 90){
+            return BinStatus.CRITICAL;
+        } 
+        
+        if (percent >= 70){
+            return BinStatus.WARNING;
+        }
+        
+        return BinStatus.OK;
+    }
+
+
+    //toistaiseksi turha? jos muodoltaan symmetrinen riittää korkeus
+    //Laskenta kapasiteetilla vai korkeudella? Tarvitaanko kapasiteettia? 
+
+    public void updateFillLevelFromCensor(double distance){
+
+        double percent = (dimensions.height() - distance) / dimensions.height() * 100;
+        this.fillLevel = new FillLevel(percent);
+
+    }
+
+    //Tarvitaanko 
+    public boolean needsCollection() {
+        return getStatus() == BinStatus.CRITICAL;
+    }
+
+    //Getterit, binid, filllevel, siteid 
+
+    public FillLevel getFillLevel() {
+        return fillLevel;
+    }
+
+    public BinId getBinId() {
+        return binId;
+    }
+
+    public SiteId getSiteId() {
+        return siteId;
+    }
+
 
 }

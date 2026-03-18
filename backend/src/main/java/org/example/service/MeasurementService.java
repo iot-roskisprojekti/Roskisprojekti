@@ -26,12 +26,23 @@ public class MeasurementService {
     @Transactional
     public List<MeasurementDto> getAllMeasurements() {
         List<MeasurementEntity> measurements = measurementRepository.findAll();
-        //Todo: käy läpi jokainen measurements listan MeasurementEntity
-        // Muunna MeasurementEntity -> MeasurementDto
-        // Muunna (tarvittaessa) MeasuremenEntityn kentän datatyyppi MeasurementDto odottamaan muotoon
-        // Lisää MeasurementDto palautettavaan listaan
 
-        return List.of();
+        List<MeasurementDto> result = new java.util.ArrayList<>();
+        //Todo: käy läpi jokainen measurements listan MeasurementEntity
+
+        for (MeasurementEntity m : measurements){
+                // Muunna (tarvittaessa) MeasuremenEntityn kentän datatyyppi MeasurementDto odottamaan muotoon
+            MeasurementDto dto = new MeasurementDto(
+                m.getId(),
+                m.getSiteEntity().getId(),
+                m.getFillPercent().doubleValue(),
+                m.getMeasuredAt().getEpochSecond() //UTC seconds
+            );
+        // Lisää MeasurementDto palautettavaan listaan
+            result.add(dto);
+        }
+
+        return result;
     }
 
 
