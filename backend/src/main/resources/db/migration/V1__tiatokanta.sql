@@ -2,7 +2,6 @@
 CREATE TABLE site (
                       site_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                       name VARCHAR(100) NOT NULL,
-                      capacity_liters DECIMAL(10, 2) NOT NULL,
                       location VARCHAR(200) NOT NULL
 );
 
