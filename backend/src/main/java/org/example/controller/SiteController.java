@@ -2,10 +2,9 @@ package org.example.controller;
 
 import org.example.model.dto.SiteDto;
 import org.example.service.SiteService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,4 +22,24 @@ public class SiteController {
     public List<SiteDto> getAllSites() {
         return siteService.getAllSites();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSite(@PathVariable Long id) {
+        siteService.deleteSite(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping()
+    public ResponseEntity<SiteDto> addSite(@RequestBody SiteDto siteDto){
+        return new ResponseEntity<>(siteService.addSite(siteDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+
+    public ResponseEntity<SiteDto> modifySite(@PathVariable Long id, @RequestBody SiteDto siteDto){
+
+        return new ResponseEntity<>(siteService.modifySite(id, siteDto), HttpStatus.OK);
+    }
+
+
 }

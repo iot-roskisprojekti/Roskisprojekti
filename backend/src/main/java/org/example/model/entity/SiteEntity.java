@@ -5,12 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 @Entity
 @Table(name = "site", schema = "roskis_db")
 public class SiteEntity {
@@ -28,9 +30,9 @@ public class SiteEntity {
     @NotNull
     @Column(name = "location", nullable = false, length = 200)
     private String location;
-    @OneToMany(mappedBy = "site")
+    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AlertEntity> alerts = new LinkedHashSet<>();
-    @OneToMany(mappedBy = "siteEntity")
+    @OneToMany(mappedBy = "siteEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MeasurementEntity> measurements = new LinkedHashSet<>();
 
 
