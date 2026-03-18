@@ -1,4 +1,4 @@
 package org.example.domain.bin;
 
-public record BinId() {
+public record SiteId() {
 }
