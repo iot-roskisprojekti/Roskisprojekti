@@ -8,7 +8,6 @@ import org.example.mapper.SiteMapper;
 import org.example.repository.MeasurementRepository;
 import org.example.repository.SiteRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,30 +20,6 @@ public class SiteService {
     private final MeasurementRepository measurementRepository;
     private final SiteMapper siteMapper;
 
-    public void deleteSite(Long id) {
-        siteRepository.deleteById(id);
-    }
-
-    @Transactional
-    public SiteDto addSite(SiteDto siteDto){
-
-        return siteMapper.toDto(siteRepository.save(new SiteEntity()
-                .setName(siteDto.name())
-                .setLocation("?")
-        ), null);
-    }
-
-    @Transactional
-    public SiteDto modifySite(Long id, SiteDto siteDto) {
-
-        SiteEntity site = siteRepository.findById(id).orElseThrow();
-
-        site.setName(siteDto.name());
-        site.setLocation("?");
-
-        return siteMapper.toDto(siteRepository.save(site), null);
-    }
-
     public List<SiteDto> getAllSites() {
         List<SiteEntity> entities = siteRepository.findAll();
 
@@ -56,7 +31,4 @@ public class SiteService {
             return siteMapper.toDto(site, latest);
         }).toList();
     }
-
-
-
 }
