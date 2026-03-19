@@ -20,9 +20,12 @@ public interface SiteMapper {
     @Mapping(target = "fillPercent", expression = "java(latest != null ? latest.getFillPercent().intValue() : 0)")
     @Mapping(target = "status", expression = "java(determineStatus(latest))")
     @Mapping(target = "lastUpdated", expression = "java(latest != null ? java.time.LocalDateTime.ofInstant(latest.getMeasuredAt(), java.time.ZoneId.systemDefault()) : java.time.LocalDateTime.now())")
+    @Mapping(target = "capacity", source = "site.capacityLiters")
+
     SiteDto toDto(SiteEntity site, MeasurementEntity latest);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "capacityLiters", source = "capacity")
     void updateEntityFromDto(SiteDto dto, @MappingTarget SiteEntity site);
 
     default String determineStatus(MeasurementEntity latest) {
