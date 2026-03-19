@@ -118,7 +118,8 @@ export default function App() {
 
         return {
           id: c.id.toString(),
-          location: c.name,
+          name: c.name,
+          location: c.location,
           fillLevel: newFill,
           capacity: 100,
           status: newFill >= 85 ? "critical" :

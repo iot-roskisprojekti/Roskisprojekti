@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function BinCard({ id, location, fillLevel, capacity, lastUpdate, isOnline, hasTask }) {
+export default function BinCard({ id, name, location, fillLevel, capacity, lastUpdate, isOnline, hasTask }) {
 
   // Väri täyttöasteen mukaan, mutta offline = harmaa
   let color = "green";
@@ -26,7 +26,9 @@ export default function BinCard({ id, location, fillLevel, capacity, lastUpdate,
       transition: "border 0.3s ease"
     }}>
       {/* ID / Nimi */}
-      <h3 style={{ marginBottom: "0.5rem" }}>Roska-astia {id}</h3>
+      <h3 style={{ marginBottom: "0.5rem" }}>
+        {name || `Roska-astia ${id}`}
+      </h3>
 
       {/* Sijainti logolla */}
       <p style={{ marginBottom: "0.5rem" }}>

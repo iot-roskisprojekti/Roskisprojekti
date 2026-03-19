@@ -4,6 +4,7 @@ export default function Containers({ containers, setContainers }) {
   const [editingId, setEditingId] = useState(null);
   const [editedData, setEditedData] = useState({});
   const [newContainer, setNewContainer] = useState({
+    name: "",
     location: "",
     fillLevel: 0,
     capacity: 100,
@@ -34,7 +35,8 @@ export default function Containers({ containers, setContainers }) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: editedData.location,
+          name: editedData.name,
+          location: editedData.location,
           capacity: editedData.capacity,
         }),
       });
@@ -46,7 +48,7 @@ export default function Containers({ containers, setContainers }) {
 
       setContainers(containers.map(c =>
         c.id === editingId
-          ? { ...c, location: updated.name, capacity: updated.capacity }
+          ? { ...c, name: updated.name, location: updated.location, capacity: updated.capacity }
           : c
       ));
     } catch (error) {
@@ -96,7 +98,8 @@ export default function Containers({ containers, setContainers }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: newContainer.location,
+          name: newContainer.name,
+          location: newContainer.location,
           capacity: newContainer.capacity,
         }),
       });
@@ -110,6 +113,7 @@ export default function Containers({ containers, setContainers }) {
         id: saved.id.toString(),
       }]);
       setNewContainer({
+        name: "",
         location: "",
         fillLevel: 0,
         capacity: 100,
@@ -132,6 +136,7 @@ export default function Containers({ containers, setContainers }) {
       default: return status;
     }
   };
+console.log(containers);
 
   // JSX
   return (
@@ -142,6 +147,14 @@ export default function Containers({ containers, setContainers }) {
       <div className="card mb-4 p-3" style={{ maxWidth: "400px" }}>
         <h5>Lisää uusi säiliö</h5>
         <div className="mb-2">
+        <label>Nimi</label>
+        <input
+          name="name"
+          placeholder="Nimi"
+          value={newContainer.name}
+          onChange={handleNewChange}
+          className="form-control mb-2"
+        />
           <label>Sijainti</label>
           <input
             name="location"
@@ -170,6 +183,7 @@ export default function Containers({ containers, setContainers }) {
         <thead>
           <tr>
             <th>ID</th>
+            <th>Nimi</th>
             <th>Sijainti</th>
             <th>Täyttöaste</th>
             <th>Kapasiteetti</th>
@@ -183,6 +197,18 @@ export default function Containers({ containers, setContainers }) {
             <tr key={c.id}>
               <td>{c.id}</td>
               <td>
+                {editingId === c.id ? (
+                  <input
+                    name="name"
+                    value={editedData.name}
+                    onChange={handleChange}
+                    className="form-control"
+                  />
+                ) : (
+                  c.name
+                )}
+                </td>
+                <td>
                 {editingId === c.id ? (
                   <input
                     name="location"

@@ -33,6 +33,7 @@ export default function Dashboard({
           <BinCard
             key={bin.id}
             id={bin.id}
+            name={bin.name}
             location={bin.location}
             fillLevel={bin.fillLevel}
             capacity={bin.capacity}
