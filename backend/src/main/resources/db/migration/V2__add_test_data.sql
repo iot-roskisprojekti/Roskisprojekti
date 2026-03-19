@@ -1,10 +1,9 @@
--- Testailuja
-INSERT INTO site (name, location) VALUES
-                                      ('Kohde 1', 'Katu 1'),
-                                      ('Kohde 2', 'Katu 2'),
-                                      ('Kohde 3', 'Katu 3'),
-                                      ('Kohde 4', 'Katu 4'),
-                                      ('Kohde 5', 'Katu 5');
+INSERT INTO site (name, capacity_liters, location) VALUES
+                                                       ('Kohde 1', 20, 'Katu 1'),
+                                                       ('Kohde 2', 20,'Katu 2'),
+                                                       ('Kohde 3', 20,'Katu 3'),
+                                                       ('Kohde 4', 20,'Katu 4'),
+                                                       ('Kohde 5', 20,'Katu 5');
 
 INSERT INTO measurement (site_id, fill_percent, measured_at) VALUES
                                                                  (1, 32.5, NOW() - INTERVAL 60 MINUTE),
