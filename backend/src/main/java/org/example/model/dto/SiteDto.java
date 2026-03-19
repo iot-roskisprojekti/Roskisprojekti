@@ -7,6 +7,7 @@ public record SiteDto(
         Long id,
         String name,
         String location,
+        java.math.BigDecimal capacityLiters,
         Integer fillPercent,
         String status,
         LocalDateTime lastUpdated
