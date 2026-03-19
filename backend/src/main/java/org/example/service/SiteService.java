@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.model.dto.SiteDto;
 import org.example.model.entity.MeasurementEntity;
@@ -27,20 +28,21 @@ public class SiteService {
 
     @Transactional
     public SiteDto addSite(SiteDto siteDto){
+        SiteEntity newSite = new SiteEntity();
 
-        return siteMapper.toDto(siteRepository.save(new SiteEntity()
-                .setName(siteDto.name())
-                .setLocation("?")
+        siteMapper.updateEntityFromDto(siteDto, newSite);
+
+        return siteMapper.toDto(siteRepository.save(newSite
         ), null);
     }
 
     @Transactional
     public SiteDto modifySite(Long id, SiteDto siteDto) {
 
-        SiteEntity site = siteRepository.findById(id).orElseThrow();
+        SiteEntity site = siteRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Id " + id + " doesn't exist in the database")) ;
 
-        site.setName(siteDto.name());
-        site.setLocation("?");
+        siteMapper.updateEntityFromDto(siteDto, site);
 
         return siteMapper.toDto(siteRepository.save(site), null);
     }
