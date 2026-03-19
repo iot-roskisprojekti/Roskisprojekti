@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -34,6 +35,9 @@ public class SiteEntity {
     private Set<AlertEntity> alerts = new LinkedHashSet<>();
     @OneToMany(mappedBy = "siteEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MeasurementEntity> measurements = new LinkedHashSet<>();
+    @NotNull
+    @Column(name = "capacity_liters", nullable = false, precision = 10, scale = 2)
+    private BigDecimal capacityLiters;
 
 
 }
