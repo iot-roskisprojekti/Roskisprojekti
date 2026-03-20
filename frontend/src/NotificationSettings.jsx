@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function NotificationSettings() {
   const [contacts, setContacts] = useState([]);
@@ -10,6 +10,20 @@ export default function NotificationSettings() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  {/*api kutsut backendille
+
+  const API_URL = "http://localhost:8080/api/contacts";
+
+  // HAE kaikki yhteystiedot backendista
+  useEffect(() => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => setContacts(data))
+      .catch(err => console.error("Virhe haussa:", err));
+  }, []);
+
+*/}
+
   // input handler
   const handleChange = (e) => {
     setForm({
@@ -18,24 +32,86 @@ export default function NotificationSettings() {
     });
   };
 
-  // lisää tai päivitä
-  const handleSubmit = (e) => {
+  //poista tämä, kun kutsut toimivat backendille, ja ota käyttöön alempi kutsut backendille
+
+  // lisää tai päivitä 
+  const handleSubmit = (e) => { 
+  e.preventDefault();
+
+  if (!form.name || !form.phone || !form.email) return;
+
+  if (isEditing) { 
+    setContacts(prev => prev.map(c => (c.id === form.id ? form : c))
+   );
+   } else { 
+    setContacts(prev => [
+       ...prev, 
+       { ...form, id: Date.now().toString() } 
+      ]);
+     }
+
+     resetForm(); 
+    };
+
+    const resetForm = () => { 
+      setForm({ id: null, name: "", phone: "", email: "" }); 
+      setIsEditing(false); 
+    };
+
+    // poisto 
+    const handleDelete = (id) => { 
+      setContacts(prev => prev.filter(c => c.id !== id)); 
+    };
+
+    // muokkaus 
+    const handleEdit = (contact) => { 
+      setForm(contact); 
+      setIsEditing(true); 
+    };
+
+
+
+{/*kutsut backendille
+
+  // LISÄÄ tai PÄIVITÄ (POST / PUT)
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.name || !form.phone || !form.email) return;
 
-    if (isEditing) {
-      setContacts(prev =>
-        prev.map(c => (c.id === form.id ? form : c))
-      );
-    } else {
-      setContacts(prev => [
-        ...prev,
-        { ...form, id: Date.now().toString() }
-      ]);
-    }
+    try {
+      if (isEditing) {
+        // UPDATE
+        const res = await fetch(`${API_URL}/${form.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form)
+        });
 
-    resetForm();
+        const updated = await res.json();
+
+        setContacts(prev =>
+          prev.map(c => (c.id === form.id ? updated : c))
+        );
+
+      } else {
+        // CREATE
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form)
+        });
+
+        const newContact = await res.json();
+
+        setContacts(prev => [...prev, newContact]);
+      }
+
+      resetForm();
+
+    } catch (err) {
+      console.error("Virhe tallennuksessa:", err);
+    }
   };
 
   const resetForm = () => {
@@ -43,56 +119,61 @@ export default function NotificationSettings() {
     setIsEditing(false);
   };
 
-  // poisto
-  const handleDelete = (id) => {
-    setContacts(prev => prev.filter(c => c.id !== id));
+  // DELETE
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+
+      setContacts(prev => prev.filter(c => c.id !== id));
+
+    } catch (err) {
+      console.error("Virhe poistossa:", err);
+    }
   };
 
-  // muokkaus
+  // EDIT
   const handleEdit = (contact) => {
     setForm(contact);
     setIsEditing(true);
   };
 
+*/}
+
   return (
     <div className="container mt-4">
       <h2>Ilmoitusten vastaanottajat</h2>
 
-      {/* FORM */}
+      {/*form*/}
       <form onSubmit={handleSubmit} className="mb-4">
 
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="text"
-            name="name"
-            placeholder="Nimi"
-            value={form.name}
-            onChange={handleChange}
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          type="text"
+          name="name"
+          placeholder="Nimi"
+          value={form.name}
+          onChange={handleChange}
+        />
 
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="text"
-            name="phone"
-            placeholder="Puhelinnumero"
-            value={form.phone}
-            onChange={handleChange}
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          type="text"
+          name="phone"
+          placeholder="Puhelinnumero"
+          value={form.phone}
+          onChange={handleChange}
+        />
 
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="email"
-            name="email"
-            placeholder="Sähköposti"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </div>
+        <input
+          className="form-control mb-2"
+          type="email"
+          name="email"
+          placeholder="Sähköposti"
+          value={form.email}
+          onChange={handleChange}
+        />
 
         <button className="btn btn-primary me-2" type="submit">
           {isEditing ? "Tallenna muutokset" : "Lisää yhteystieto"}
@@ -109,7 +190,7 @@ export default function NotificationSettings() {
         )}
       </form>
 
-      {/* LISTA */}
+        {/*lista*/}
       <table className="table table-striped">
         <thead>
           <tr>
