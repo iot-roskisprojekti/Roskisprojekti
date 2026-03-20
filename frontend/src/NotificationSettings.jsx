@@ -35,43 +35,43 @@ export default function NotificationSettings() {
   //poista tämä, kun kutsut toimivat backendille, ja ota käyttöön alempi kutsut backendille
 
   // lisää tai päivitä 
-  const handleSubmit = (e) => { 
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  if (!form.name || !form.phone || !form.email) return;
+    if (!form.name || !form.phone || !form.email) return;
 
-  if (isEditing) { 
-    setContacts(prev => prev.map(c => (c.id === form.id ? form : c))
-   );
-   } else { 
-    setContacts(prev => [
-       ...prev, 
-       { ...form, id: Date.now().toString() } 
+    if (isEditing) {
+      setContacts(prev => prev.map(c => (c.id === form.id ? form : c))
+      );
+    } else {
+      setContacts(prev => [
+        ...prev,
+        { ...form, id: Date.now().toString() }
       ]);
-     }
+    }
 
-     resetForm(); 
-    };
+    resetForm();
+  };
 
-    const resetForm = () => { 
-      setForm({ id: null, name: "", phone: "", email: "" }); 
-      setIsEditing(false); 
-    };
+  const resetForm = () => {
+    setForm({ id: null, name: "", phone: "", email: "" });
+    setIsEditing(false);
+  };
 
-    // poisto 
-    const handleDelete = (id) => { 
-      setContacts(prev => prev.filter(c => c.id !== id)); 
-    };
+  // poisto 
+  const handleDelete = (id) => {
+    setContacts(prev => prev.filter(c => c.id !== id));
+  };
 
-    // muokkaus 
-    const handleEdit = (contact) => { 
-      setForm(contact); 
-      setIsEditing(true); 
-    };
+  // muokkaus 
+  const handleEdit = (contact) => {
+    setForm(contact);
+    setIsEditing(true);
+  };
 
+  //poisto tähän saakka
 
-
-{/*kutsut backendille
+  {/*kutsut backendille
 
   // LISÄÄ tai PÄIVITÄ (POST / PUT)
   const handleSubmit = async (e) => {
@@ -190,7 +190,7 @@ export default function NotificationSettings() {
         )}
       </form>
 
-        {/*lista*/}
+      {/*lista*/}
       <table className="table table-striped">
         <thead>
           <tr>
@@ -213,7 +213,7 @@ export default function NotificationSettings() {
                 <td>{contact.email}</td>
                 <td>
                   <button
-                    className="btn btn-sm btn-warning me-2"
+                    className="btn btn-sm btn-primary me-2"
                     onClick={() => handleEdit(contact)}
                   >
                     Muokkaa
