@@ -27,6 +27,10 @@ export default function App() {
   const [systemStatus, setSystemStatus] = useState("online");
   const [errorMessage, setErrorMessage] = useState(null);
 
+  useEffect(() => {
+  refreshContainers();
+}, []);
+
   //  Automaattinen tehtävälogiikka hälytyksistä
   useEffect(() => {
     setTasks(prevTasks => {
