@@ -7,7 +7,7 @@ export default function Containers({ containers, setContainers }) {
     name: "",
     location: "",
     fillLevel: 0,
-    capacity: 100,
+    capacity: "",
     status: "normal",
     isOnline: true,
     lastUpdate: new Date().toLocaleTimeString(),
@@ -163,7 +163,7 @@ console.log(containers);
             onChange={handleNewChange}
             className="form-control mb-2"
           />
-          <label>Kapasiteetti</label>
+          <label>Kapasiteetti (litroina)</label>
           <input
             name="capacity"
             type="number"
