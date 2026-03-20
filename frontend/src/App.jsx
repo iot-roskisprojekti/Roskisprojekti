@@ -121,7 +121,7 @@ export default function App() {
           name: c.name,
           location: c.location,
           fillLevel: newFill,
-          capacity: 100,
+          capacity: c.capacity,
           status: newFill >= 85 ? "critical" :
             newFill >= 70 ? "warning" : "normal",
           lastUpdate: new Date().toLocaleTimeString(),
