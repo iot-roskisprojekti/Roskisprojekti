@@ -2,6 +2,7 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.example.model.dto.MeasurementDto;
@@ -26,12 +27,16 @@ public class MeasurementService {
     @Transactional
     public List<MeasurementDto> getAllMeasurements() {
         List<MeasurementEntity> measurements = measurementRepository.findAll();
-        //Todo: käy läpi jokainen measurements listan MeasurementEntity
-        // Muunna MeasurementEntity -> MeasurementDto
-        // Muunna (tarvittaessa) MeasuremenEntityn kentän datatyyppi MeasurementDto odottamaan muotoon
-        // Lisää MeasurementDto palautettavaan listaan
-
-        return List.of();
+        List<MeasurementDto> measurementDtos = new ArrayList<>(measurements.size());
+        for (MeasurementEntity measurement : measurements) {
+            measurementDtos.add(new MeasurementDto(
+                    measurement.getId(),
+                    measurement.getSiteEntity().getId(),
+                    measurement.getFillPercent().doubleValue(),
+                    measurement.getMeasuredAt().getEpochSecond()
+            ));
+        }
+        return measurementDtos;
     }
 
 
