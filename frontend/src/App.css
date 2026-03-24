@@ -61,5 +61,39 @@
   text-align: center;
 }
 
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Hover efekti */
+.nav-link:hover {
+  transform: translateY(-2px);
+}
+
+/* Active link */
+.active-link {
+  color: #0d6efd !important;
+  font-weight: 600;
+}
+
+/* Liukuva underline */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 3px;
+  width: 0;
+  background: #0d6efd;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Aktiivinen = viiva näkyy */
+.active-link::after {
+  width: 100%;
+}
+
 
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, NavLink } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 
 import Dashboard from "./Dashboard";
@@ -163,10 +163,21 @@ export default function App() {
 
                 {/* Keskellä navigointi */}
                 <div className="navbar-nav justify-content-center w-100">
-                  <Link className="nav-link mx-3" to="/">Tilannekuva</Link>
-                  <Link className="nav-link mx-3" to="/tehtavat">Työtehtävät</Link>
-                  <Link className="nav-link mx-3" to="/sailiot">Säiliöt</Link>
-                  <Link className="nav-link mx-3" to="/raportit">Raportit</Link>
+                  <NavLink 
+                    to="/" 
+                    className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}
+                  >
+                    Tilannekuva
+                  </NavLink>
+                  <NavLink to="/tehtavat" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
+                    Työtehtävät
+                  </NavLink>
+                  <NavLink to="/sailiot" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
+                    Säiliöt
+                  </NavLink>
+                  <NavLink to="/raportit" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
+                    Raportit
+                  </NavLink>
                 </div>
 
                 {/* Oikeaan reunaan asetukset */}
