@@ -1,6 +1,4 @@
 -- Luodaan tietokanta
-CREATE DATABASE IF NOT EXISTS iot_bins;
-USE iot_bins;
 
 -- Työntekijät
 CREATE TABLE employee (
