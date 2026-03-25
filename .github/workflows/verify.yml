@@ -3,7 +3,7 @@ name: Backend Verification
 
 on:
   push:
-    branches: [ citest ]
+    branches: [ citest, testailu ]
     paths:
       - 'backend/**'
       - 'docker-compose.yml'
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: write 
+      checks: write
 
     steps:
       - name: Checkout Source
@@ -77,16 +77,16 @@ jobs:
             # Extract the final 'Caused by' which contains the primitive exception
             CORE_ERROR=$(grep "Caused by:" "$REPORT_FILE" | tail -1 | sed 's/Caused by: //')
             echo "**Root Cause detected:** \`$CORE_ERROR\`" >> $GITHUB_STEP_SUMMARY
-            
+          
             # Logic Tier 1: SQL Migration Failures
             if grep -q "FlywayException" "$REPORT_FILE" || grep -q "SQL" "$REPORT_FILE"; then
               SQL_FILE=$(grep -oE "V[0-9]+__[a-zA-Z0-9_]+\.sql" "$REPORT_FILE" | head -1 || echo "V1__tiatokanta.sql")
               echo "::error file=backend/src/main/resources/db/migration/$SQL_FILE,title=SQL Migration Failure::$CORE_ERROR"
-            
+          
             # Logic Tier 2: Property/Connection Failures
             elif grep -qE "Hikari|DataSource|jdbc" "$REPORT_FILE"; then
               echo "::error file=backend/src/main/resources/application.properties,title=Database Config Failure::$CORE_ERROR"
-            
+          
             # Logic Tier 3: General Context Failure
             else
               echo "::error file=backend/src/test/java/org/example/BackendLoadTest.java,title=Context Bootstrap Failure::$CORE_ERROR"
