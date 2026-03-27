@@ -7,12 +7,14 @@ public class Bin {
     private final SiteId siteId;
     private Dimensions dimensions;
     private FillLevel fillLevel;
+    private AlertThreshold alertThreshold;
 
-    public Bin(BinId binId, SiteId siteId, Dimensions dimensions, FillLevel fillLevel){
+    public Bin(BinId binId, SiteId siteId, Dimensions dimensions, FillLevel fillLevel, AlertThreshold alertThreshold){
         this.binId = binId;
         this.siteId = siteId;
         this.dimensions = dimensions;
         this.fillLevel = fillLevel;
+        this.alertThreshold = alertThreshold;
     }
 
     //rosentteina 0-100 -- tämä riittänee tässä vaiheessa
@@ -26,11 +28,11 @@ public class Bin {
     public BinStatus getStatus() {
         double percent = fillLevel.percent();
 
-        if (percent >= 90){
+        if (percent >= alertThreshold.critical()){
             return BinStatus.CRITICAL;
         } 
         
-        if (percent >= 70){
+        if (percent >= alertThreshold.warning()){
             return BinStatus.WARNING;
         }
         

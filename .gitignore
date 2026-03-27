@@ -50,3 +50,4 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 node_modules
+.venv/
