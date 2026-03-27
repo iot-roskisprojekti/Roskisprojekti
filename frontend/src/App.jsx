@@ -96,53 +96,37 @@ export default function App() {
 
   //  Päivitys – nappia painamalla
   const refreshContainers = async () => {
+  setLoading(true);
+  setErrorMessage(null);
 
-    setLoading(true);
-    setErrorMessage(null);
+  try {
+    const response = await fetch("http://localhost:8080/api/sites");
+    if (!response.ok) throw new Error("Palvelinvirhe");
 
-    try {
+    const data = await response.json();
 
-      //  Hae backendistä säiliöt
-      const response = await fetch("http://localhost:8080/api/sites");
-      if (!response.ok) throw new Error("Palvelinvirhe");
+    const mapped = data.map(c => ({
+      id: c.id.toString(),
+      name: c.name,
+      location: c.location,
+      fillLevel: c.fillPercent,
+      capacity: c.capacity,
+      status: c.fillPercent >= 85 ? "critical" :
+              c.fillPercent >= 70 ? "warning" : "normal",
+      lastUpdate: new Date().toLocaleTimeString(),
+      isOnline: true
+    }));
 
-      const data = await response.json();
+    setContainers(mapped);
+    setSystemStatus("online");
 
-      //  Simulaatio satunnaisella täyttöasteen muutoksella
-      const simulated = data.map(c => {
-        const randomIncrease = Math.floor(Math.random() * 10); // 0–9%
-        let newFill = Math.min(c.fillPercent + randomIncrease, 100); // ei yli 100%
-
-        //  Lähetetään backendille päivitys
-        fetch(`http://localhost:8080/api/sites/${c.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fillPercent: newFill })
-        }).catch(e => console.error("Virhe backend-päivityksessä:", e));
-
-        return {
-          id: c.id.toString(),
-          name: c.name,
-          location: c.location,
-          fillLevel: newFill,
-          capacity: c.capacity,
-          status: newFill >= 85 ? "critical" :
-            newFill >= 70 ? "warning" : "normal",
-          lastUpdate: new Date().toLocaleTimeString(),
-          isOnline: true
-        };
-      });
-
-      setContainers(simulated);
-      setSystemStatus("online");
-
-    } catch (error) {
-      setSystemStatus("offline");
-      setErrorMessage("Yhteys palvelimeen katkennut");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    setSystemStatus("offline");
+    setErrorMessage("Yhteys palvelimeen katkennut");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Router>
