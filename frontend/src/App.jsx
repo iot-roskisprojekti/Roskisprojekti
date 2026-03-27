@@ -94,7 +94,7 @@ export default function App() {
     });
   };
 
-  //  Päivitys – nappia painamalla
+  //  Päivitys – nappia painamalla, hakee säiliöiden tiedot backendistä
   const refreshContainers = async () => {
   setLoading(true);
   setErrorMessage(null);
