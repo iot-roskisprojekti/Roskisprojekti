@@ -37,6 +37,11 @@ public class TaskEntity {
 
     @Column(name = "done_at")
     private Instant doneAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_employee_id")
+    private EmployeeEntity assignedEmployee;
+    @Column(name = "assigned_at")
+    private Instant assignedAt;
 
 
 }

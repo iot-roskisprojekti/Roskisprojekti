@@ -33,7 +33,7 @@ public class MeasurementService {
                     measurement.getId(),
                     measurement.getSiteEntity().getId(),
                     measurement.getFillPercent().doubleValue(),
-                    measurement.getMeasuredAt().getEpochSecond()
+                    measurement.getMeasuredAt()
             ));
         }
         return measurementDtos;
@@ -50,7 +50,7 @@ public class MeasurementService {
         
         measurement.setFillPercent(java.math.BigDecimal.valueOf(dto.fillPercent()));
         
-        measurement.setMeasuredAt(java.time.Instant.ofEpochSecond(dto.measuredAt()));
+        measurement.setMeasuredAt(dto.measuredAt());
 
         measurementRepository.save(measurement); //Maagisesti kirjoittaa tietokantaan. Simsalabim.
 
