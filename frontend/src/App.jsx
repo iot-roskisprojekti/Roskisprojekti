@@ -98,7 +98,8 @@ export default function App() {
   const refreshContainers = async () => {
   setLoading(true);
   setErrorMessage(null);
-
+  
+  
   try {
     const response = await fetch("http://localhost:8080/api/sites");
     if (!response.ok) throw new Error("Palvelinvirhe");
@@ -127,7 +128,12 @@ export default function App() {
     setLoading(false);
   }
 };
-
+  useEffect(()=>{
+    refreshContainers();
+    const interval = setInterval(refreshContainers, 5000);
+    return ()=> clearInterval(interval);
+  }, []);
+  
   return (
     <Router>
       <div className="app">
