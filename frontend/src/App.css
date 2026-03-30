@@ -73,7 +73,7 @@
 
 /* Active link */
 .active-link {
-  color: #0d6efd !important;
+  color: #000 !important;
   font-weight: 600;
 }
 
@@ -85,7 +85,7 @@
   bottom: -4px;
   height: 3px;
   width: 0;
-  background: #0d6efd;
+  background: #000;
   border-radius: 2px;
   transition: width 0.3s ease;
 }
