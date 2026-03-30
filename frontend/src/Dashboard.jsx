@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import BinCard from "./BinCard";
 
 export default function Dashboard({
@@ -12,21 +12,31 @@ export default function Dashboard({
   const totalBins = containers.length;
   const offlineBins = containers.filter(bin => bin.isOnline === false);
 
-  const sortedContainers = [...containers].sort((a, b) => {
-  const priority = (bin) => {
-    if (bin.fillLevel >= 85) return 3; // kriittinen
-    if (bin.fillLevel >= 70) return 2; // varoitus
-    return 1; // normaali
+  // STATUS LOGIIKKA (yhdenmukainen koko appiin)
+  const getPriority = (bin) => {
+    if (!bin.isOnline) return 4;        // offline aina ylimmäksi
+    if (bin.fillLevel >= 85) return 3;  // kriittinen
+    if (bin.fillLevel >= 70) return 2;  // varoitus
+    return 1;                           // normaali
   };
 
-  return priority(b) - priority(a);
-});
+  const sortedContainers = useMemo(() => {
+    return [...containers].sort((a, b) => {
+      const diff = getPriority(b) - getPriority(a);
 
+      // jos sama prioriteetti-> eniten täynnä ensin
+      if (diff === 0) {
+        return (b.fillLevel || 0) - (a.fillLevel || 0);
+      }
+
+      return diff;
+    });
+  }, [containers]);
 
   return (
     <div style={{ padding: "20px" }}>
 
-      {/* DATAYHTEYS-HÄLYTYKSET */}
+      {/* SYSTEM ALERTS */}
       {systemStatus === "offline" && (
         <div className="alert alert-danger text-center">
           <strong>JÄRJESTELMÄ OFFLINE</strong><br />
@@ -47,7 +57,7 @@ export default function Dashboard({
         </div>
       )}
 
-      {/* OTSIKKO + PÄIVITYS */}
+      {/* HEADER */}
       <div
         style={{
           display: "flex",
@@ -68,7 +78,7 @@ export default function Dashboard({
         </button>
       </div>
 
-      {/* GRID (KAIKKI KORTIT) */}
+      {/* GRID */}
       <div
         style={{
           display: "grid",
@@ -82,6 +92,9 @@ export default function Dashboard({
             task => task.containerId === bin.id
           );
 
+          const isCritical = !bin.isOnline ? false : bin.fillLevel >= 85;
+          const isWarning = !bin.isOnline ? false : bin.fillLevel >= 70 && bin.fillLevel < 85;
+
           return (
             <BinCard
               key={bin.id}
@@ -93,6 +106,9 @@ export default function Dashboard({
               lastUpdate={bin.lastUpdate}
               isOnline={bin.isOnline}
               hasTask={hasTask}
+              isCritical={isCritical}
+              isWarning={isWarning}
+              isOffline={!bin.isOnline}
             />
           );
         })}
