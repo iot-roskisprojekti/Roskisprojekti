@@ -1,0 +1,115 @@
+#Tekoälyn generoima action. Katotaan, katotaan...
+name: Backend Verification
+
+on:
+  push:
+    branches: [ citest, testailu ]
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yml'
+      - '.env.pohja'
+      - '.env'
+
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Load Environment with Fail-Safe Fallback
+        run: |
+          if [ -f ".env.pohja" ]; then
+            echo "STATUS: Synchronizing from .env.pohja template."
+            cp .env.pohja .env
+          elif [ -f ".env" ]; then
+            echo "STATUS: Using .env from repository index."
+          else
+            echo "WARNING: Generating MVP hardcoded defaults."
+            echo "DB_USER=root" > .env
+            echo "DB_PASS=root_password" >> .env
+            echo "DB_NAME=roskis_db" >> .env
+            echo "DOCKER_DB_HOSTNAME=db" >> .env
+            echo "DOCKER_DB_PORT=3306" >> .env
+            echo "DOCKER_MQTT_HOSTNAME=mqtt" >> .env
+            echo "DOCKER_MQTT_PORT=1883" >> .env
+            echo "HOST_DB_PORT=3307" >> .env
+            echo "HOST_MQTT_PORT=1884" >> .env
+            echo "HOST_MQTT_WS_PORT=9002" >> .env
+          fi
+          sed -i "s/DB_PASS=.*/DB_PASS=root_password/g" .env
+          grep -v '^#' .env | grep -v '^$' >> $GITHUB_ENV
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Instantiate Infrastructure
+        run: docker compose up -d db mqtt
+
+      - name: Database Health Synchronization
+        run: |
+          timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} roskisprojekti-db-1)" == "healthy" ]; do sleep 2; done'
+          echo "Database Invariant Satisfied."
+
+      - name: Execute Maven Verification
+        # Capture output for potential regex parsing if reports are missing
+        run: ./mvnw clean verify --batch-mode --errors --no-transfer-progress
+        working-directory: ./backend
+        env:
+          DB_PASS: root_password
+
+      - name: Extract and Annotate Root Cause
+        if: failure()
+        run: |
+          REPORT_FILE="backend/target/surefire-reports/org.example.BackendLoadTest.txt"
+          echo "### 🔍 Automated Failure Analysis" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "$REPORT_FILE" ]; then
+            # Extract the final 'Caused by' which contains the primitive exception
+            CORE_ERROR=$(grep "Caused by:" "$REPORT_FILE" | tail -1 | sed 's/Caused by: //')
+            echo "**Root Cause detected:** \`$CORE_ERROR\`" >> $GITHUB_STEP_SUMMARY
+          
+            # Logic Tier 1: SQL Migration Failures
+            if grep -q "FlywayException" "$REPORT_FILE" || grep -q "SQL" "$REPORT_FILE"; then
+              SQL_FILE=$(grep -oE "V[0-9]+__[a-zA-Z0-9_]+\.sql" "$REPORT_FILE" | head -1 || echo "V1__tiatokanta.sql")
+              echo "::error file=backend/src/main/resources/db/migration/$SQL_FILE,title=SQL Migration Failure::$CORE_ERROR"
+          
+            # Logic Tier 2: Property/Connection Failures
+            elif grep -qE "Hikari|DataSource|jdbc" "$REPORT_FILE"; then
+              echo "::error file=backend/src/main/resources/application.properties,title=Database Config Failure::$CORE_ERROR"
+          
+            # Logic Tier 3: General Context Failure
+            else
+              echo "::error file=backend/src/test/java/org/example/BackendLoadTest.java,title=Context Bootstrap Failure::$CORE_ERROR"
+            fi
+          else
+            echo "ERROR: Test report file not found. Check Maven logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Publish Test Results
+        if: always()
+        uses: scacap/action-surefire-report@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
+
+      - name: Archive Test Reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-test-reports
+          path: backend/target/surefire-reports/
+          retention-days: 5
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v

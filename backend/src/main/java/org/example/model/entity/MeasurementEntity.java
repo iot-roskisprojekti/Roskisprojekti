@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class MeasurementEntity {
 
     @NotNull
     @Column(name = "measured_at", nullable = false)
-    private Instant measuredAt;
+    private LocalDateTime measuredAt;
 
 
 }
