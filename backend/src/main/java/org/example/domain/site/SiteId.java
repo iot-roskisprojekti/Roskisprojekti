@@ -1,4 +1,4 @@
-package org.example.domain.bin;
+package org.example.domain.site;
 
 public record SiteId(Long value) {
     public SiteId {
