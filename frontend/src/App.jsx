@@ -172,7 +172,7 @@ export default function App() {
 
           </div>
 
-         
+
 
           {/* ALARIVI (NAVBAR) */}
           <nav className="navbar navbar-expand-lg bg-body-tertiary mt-3">
