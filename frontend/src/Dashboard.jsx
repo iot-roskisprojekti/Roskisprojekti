@@ -69,6 +69,7 @@ export default function Dashboard({
       >
         <h2 className="m-0">Tilannekuva</h2>
 
+        {/* manuaalinen päivitä säiliötiedot -nappi kommentoitu pois
         <button
           className="btn btn-primary"
           onClick={onRefresh}
@@ -76,6 +77,8 @@ export default function Dashboard({
         >
           Päivitä säiliötiedot
         </button>
+
+        */}
       </div>
 
       {/* GRID */}
