@@ -21,15 +21,31 @@ export default function App() {
     warningLevel: 70,
     criticalLevel: 90,
   });
+  const [currentTime, setCurrentTime] = useState(new Date());
+
 
   //  Datakatkosvalmius
   const [loading, setLoading] = useState(false);
   const [systemStatus, setSystemStatus] = useState("online");
   const [errorMessage, setErrorMessage] = useState(null);
 
+  // manuaalinen säiliötietojen päivitys
   useEffect(() => {
-  refreshContainers();
-}, []);
+    refreshContainers();
+  }, []);
+
+  // kellon päivitys
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDate = currentTime.toLocaleDateString("fi-FI");
+  const formattedTime = currentTime.toLocaleTimeString("fi-FI");
+
 
   //  Automaattinen tehtävälogiikka hälytyksistä
   useEffect(() => {
@@ -96,67 +112,85 @@ export default function App() {
 
   //  Päivitys – nappia painamalla, hakee säiliöiden tiedot backendistä
   const refreshContainers = async () => {
-  setLoading(true);
-  setErrorMessage(null);
-  
-  
-  try {
-    const response = await fetch("http://localhost:8080/api/sites");
-    if (!response.ok) throw new Error("Palvelinvirhe");
+    setLoading(true);
+    setErrorMessage(null);
 
-    const data = await response.json();
 
-    const mapped = data.map(c => ({
-      id: c.id.toString(),
-      name: c.name,
-      location: c.location,
-      fillLevel: c.fillPercent,
-      capacity: c.capacity,
-      status: c.fillPercent >= 85 ? "critical" :
-              c.fillPercent >= 70 ? "warning" : "normal",
-      lastUpdate: new Date().toLocaleTimeString(),
-      isOnline: true
-    }));
+    try {
+      const response = await fetch("http://localhost:8080/api/sites");
+      if (!response.ok) throw new Error("Palvelinvirhe");
 
-    setContainers(mapped);
-    setSystemStatus("online");
+      const data = await response.json();
 
-  } catch (error) {
-    setSystemStatus("offline");
-    setErrorMessage("Yhteys palvelimeen katkennut");
-  } finally {
-    setLoading(false);
-  }
-};
-  useEffect(()=>{
+      const mapped = data.map(c => ({
+        id: c.id.toString(),
+        name: c.name,
+        location: c.location,
+        fillLevel: c.fillPercent,
+        capacity: c.capacity,
+        status: c.fillPercent >= 85 ? "critical" :
+          c.fillPercent >= 70 ? "warning" : "normal",
+        lastUpdate: new Date().toLocaleTimeString(),
+        isOnline: true
+      }));
+
+      setContainers(mapped);
+      setSystemStatus("online");
+
+    } catch (error) {
+      setSystemStatus("offline");
+      setErrorMessage("Yhteys palvelimeen katkennut");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     refreshContainers();
     const interval = setInterval(refreshContainers, 5000);
-    return ()=> clearInterval(interval);
+    return () => clearInterval(interval);
   }, []);
-  
+
   return (
     <Router>
       <div className="app">
-
         <header className="header">
-          <div className="header-title">
-            <h1>Älykäs jäteastioiden seuranta</h1>
-            <p>Pilotissa 5 kohdetta</p>
+
+          {/* YLÄRIVI */}
+          <div className="position-relative d-flex align-items-center px-3">
+
+            {/* KESKELLE */}
+            <div className="header-title position-absolute top-50 start-50 translate-middle text-center">
+              <h1>Älykäs jäteastioiden seuranta</h1>
+              <p>Pilotissa 5 kohdetta</p>
+            </div>
+
+            {/* OIKEA REUNA */}
+            <div className="ms-auto text-end">
+              <div>{formattedDate}</div>
+              <div>{formattedTime}</div>
+            </div>
+
           </div>
 
-          <nav className="navbar navbar-expand-lg bg-body-tertiary">
+         
+
+          {/* ALARIVI (NAVBAR) */}
+          <nav className="navbar navbar-expand-lg bg-body-tertiary mt-3">
             <div className="container-fluid">
-              <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+              <button
+                className="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavAltMarkup"
+              >
                 <span className="navbar-toggler-icon"></span>
               </button>
+
               <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
 
                 {/* Keskellä navigointi */}
                 <div className="navbar-nav justify-content-center w-100">
-                  <NavLink 
-                    to="/" 
-                    className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}
-                  >
+                  <NavLink to="/" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
                     Tilannekuva
                   </NavLink>
                   <NavLink to="/tehtavat" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
@@ -199,6 +233,7 @@ export default function App() {
               </div>
             </div>
           </nav>
+
         </header>
 
         <main className="content">
