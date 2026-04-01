@@ -29,9 +29,16 @@ export default function App() {
   const [systemStatus, setSystemStatus] = useState("online");
   const [errorMessage, setErrorMessage] = useState(null);
 
-  // manuaalinen säiliötietojen päivitys
+  // säiliötietojen päivitys
   useEffect(() => {
-    refreshContainers();
+      refreshContainers();
+      
+      // automaattinen päivitys 5s välein
+    const interval = setInterval(() => {
+      refreshContainers();
+    }, 5000);
+
+  return () => clearInterval(interval);
   }, []);
 
   // kellon päivitys
