@@ -1,0 +1,42 @@
+package fi.roskisprojekti.adapter.out.persistence;
+
+import fi.roskisprojekti.adapter.out.persistence.jpa.entity.BinJpaEntity;
+import fi.roskisprojekti.adapter.out.persistence.jpa.mapper.BinPersistenceMapper;
+import fi.roskisprojekti.adapter.out.persistence.jpa.repository.BinJpaRepository;
+import fi.roskisprojekti.application.port.out.persistence.BinRepository;
+import fi.roskisprojekti.domain.bin.Bin;
+import fi.roskisprojekti.domain.bin.BinId;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Repository
+@RequiredArgsConstructor
+public class BinPersistenceAdapter implements BinRepository {
+
+    private final BinJpaRepository jpaRepository;
+
+    private final BinPersistenceMapper mapper;
+
+    @Override
+    public List<Bin> findAllBins() {
+        List<BinJpaEntity> bins = jpaRepository.findAll();
+        return bins.stream()
+                .map(mapper::toDomainEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Bin> findById(BinId id) {
+        return jpaRepository.findById(id.value())
+                .map(mapper::toDomainEntity);
+    }
+
+    @Override
+    public void save(Bin bin) {
+        jpaRepository.save(mapper.toJpaEntity(bin));
+    }
+}
