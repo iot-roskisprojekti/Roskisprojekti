@@ -14,7 +14,7 @@ public class FindBinsService implements FindBinsUseCase {
     private final BinRepository binRepository;
     @Override
     public List<Bin> findAllBins() {
-        return binRepository.findAllMeasurements();
+        return binRepository.findAllBins();
     }
 
     @Override
