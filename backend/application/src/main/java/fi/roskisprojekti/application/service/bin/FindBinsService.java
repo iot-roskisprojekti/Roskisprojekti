@@ -1,0 +1,34 @@
+package fi.roskisprojekti.application.service.bin;
+
+import fi.roskisprojekti.application.port.in.bin.FindBinsUseCase;
+import fi.roskisprojekti.application.port.out.persistence.BinRepository;
+import fi.roskisprojekti.domain.bin.Bin;
+import fi.roskisprojekti.domain.bin.BinId;
+import fi.roskisprojekti.domain.bin.BinStatus;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+public class FindBinsService implements FindBinsUseCase {
+    private final BinRepository binRepository;
+    @Override
+    public List<Bin> findAllBins() {
+        return binRepository.findAllMeasurements();
+    }
+
+    @Override
+    public List<Bin> findByQuery(String query) {
+        return List.of();
+    }
+
+    @Override
+    public List<Bin> findByStatus(BinStatus status) {
+        return List.of();
+    }
+
+    @Override
+    public Bin findById(BinId id) {
+        return null;
+    }
+}

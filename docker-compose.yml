@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:8080"  
     volumes:
-      - ./backend/src/main/resources/application-docker.properties:/app/config/application-docker.properties
+      - ./backend/bootstrap/src/main/resources/application-docker.properties:/app/config/application-docker.properties
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/app/config/
       - SPRING_PROFILES_ACTIVE=docker

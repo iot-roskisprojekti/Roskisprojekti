@@ -1,0 +1,14 @@
+package fi.roskisprojekti.adapter.in.rest.dto;
+
+import fi.roskisprojekti.domain.bin.BinStatus;
+
+import java.time.Instant;
+
+public record BinRestDto(
+        Long binId,
+        Long siteId,
+        String name,
+        Double fillLevel,
+        BinStatus status,
+        Instant lastUpdated
+) {}

@@ -13,13 +13,16 @@ client.connect("localhost", 1884, 60)
 print("Simulaatio käynnissä (MQTT)...")
 
 while True:
+    bin_id = random.randint(1, 5)
+
     data = {
-        "binId": random.randint(1, 5),
-        "distance": random.randint(0, 2150),
+        "binId": bin_id,
+        "distance": random.randint(0, 1200),
         "timestamp": datetime.now().isoformat()
     }
 
-    client.publish("telemetry/bins/1", json.dumps(data))
+    topic = f"telemetry/bins/{bin_id}"
+    client.publish(topic, json.dumps(data))
     print("Lähetetty:", data)
 
-    time.sleep(2)
+    time.sleep(4)
