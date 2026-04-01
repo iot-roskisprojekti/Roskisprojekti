@@ -108,6 +108,7 @@ export default function Dashboard({
               capacity={bin.capacity}
               lastUpdate={bin.lastUpdate}
               isOnline={bin.isOnline}
+              isStale={bin.isStale}
               hasTask={hasTask}
               isCritical={isCritical}
               isWarning={isWarning}

@@ -112,43 +112,64 @@ export default function App() {
 
   //  Päivitys – nappia painamalla, hakee säiliöiden tiedot backendistä
   const refreshContainers = async () => {
-    setLoading(true);
-    setErrorMessage(null);
+  setLoading(true);
+  setErrorMessage(null);
 
+  // 🔽 tarkistaa onko mittaus vanhentunut
+  const isStale = (timestamp) => {
+    if (!timestamp) return true;
 
-    try {
-      const response = await fetch("http://localhost:8080/api/sites");
-      if (!response.ok) throw new Error("Palvelinvirhe");
+    const now = new Date();
+    const t = new Date(timestamp);
+    const diffMinutes = (now - t) / (1000 * 60);
 
-      const data = await response.json();
+    return diffMinutes > 10; // yli 10 min = vanhentunut
+  };
 
-      const mapped = data.map(c => ({
+  try {
+    const response = await fetch("http://localhost:8080/api/sites");
+
+    if (!response.ok) throw new Error("Palvelinvirhe");
+
+    const data = await response.json();
+
+    const mapped = data.map(c => {
+      const timestamp = c.timestamp || new Date().toISOString(); // fallback
+
+      return {
         id: c.id.toString(),
         name: c.name,
         location: c.location,
         fillLevel: c.fillPercent,
         capacity: c.capacity,
-        status: c.fillPercent >= 85 ? "critical" :
-          c.fillPercent >= 70 ? "warning" : "normal",
-        lastUpdate: new Date().toLocaleTimeString(),
+
+        // status frontend logiikalla
+        status:
+          c.fillPercent >= 85
+            ? "critical"
+            : c.fillPercent >= 70
+            ? "warning"
+            : "normal",
+
+        //  UUSI LOGIIKKA
+        lastUpdate: timestamp,
+        isStale: isStale(timestamp),
+
         isOnline: true
-      }));
+      };
+    });
 
-      setContainers(mapped);
-      setSystemStatus("online");
+    setContainers(mapped);
+    setSystemStatus("online");
 
-    } catch (error) {
-      setSystemStatus("offline");
-      setErrorMessage("Yhteys palvelimeen katkennut");
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    refreshContainers();
-    const interval = setInterval(refreshContainers, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  } catch (error) {
+    setSystemStatus("offline");
+    setErrorMessage("Yhteys palvelimeen katkennut");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Router>

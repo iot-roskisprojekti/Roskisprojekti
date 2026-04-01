@@ -8,10 +8,11 @@ export default function BinCard({
   capacity,
   lastUpdate,
   isOnline,
+  isStale,
   hasTask
 }) {
 
-  // Status logiikka (käytetään sekä väriin että badgeen)
+  // Status logiikka (täyttöaste)
   const getStatus = (level) => {
     if (level >= 85) return { text: "Kriittinen", color: "#dc3545" };
     if (level >= 70) return { text: "Varoitus", color: "#fd7e14" };
@@ -28,8 +29,13 @@ export default function BinCard({
     fillColor = "#6c757d";
   }
 
-  const cardBg = isOnline ? "#fff" : "#f5f5f5";
-  const textColor = isOnline ? "#000" : "#666";
+  const cardBg = !isOnline
+    ? "#f5f5f5"
+    : isStale
+    ? "#fff8e1" // vaalea keltainen = vanhentunut data
+    : "#fff";
+
+  const textColor = !isOnline ? "#666" : "#000";
 
   return (
     <div
@@ -42,7 +48,11 @@ export default function BinCard({
         width: "260px",
         textAlign: "center",
         margin: "0.5rem",
-        border: hasTask ? "3px solid #0d6efd" : "3px solid transparent",
+        border: hasTask
+          ? "3px solid #0d6efd"
+          : isStale
+          ? "3px solid #ffc107"
+          : "3px solid transparent",
         transition: "all 0.2s ease"
       }}
     >
@@ -57,14 +67,22 @@ export default function BinCard({
           display: "inline-block",
           padding: "4px 10px",
           borderRadius: "12px",
-          backgroundColor: isOnline ? status.color : "#6c757d",
+          backgroundColor: !isOnline
+            ? "#6c757d"
+            : isStale
+            ? "#ffc107"
+            : status.color,
           color: "white",
           fontSize: "12px",
           fontWeight: "bold",
           marginBottom: "10px"
         }}
       >
-        {isOnline ? status.text : "Offline"}
+        {!isOnline
+          ? "Offline"
+          : isStale
+          ? "Vanhentunut"
+          : status.text}
       </div>
 
       {/* Sijainti */}
@@ -96,8 +114,30 @@ export default function BinCard({
 
       {/* Lisätiedot */}
       <p>Kapasiteetti: {capacity} L</p>
-      <p>Viimeksi päivitetty: {lastUpdate}</p>
+
+      <p>
+        Viimeksi päivitetty:{" "}
+        {lastUpdate
+          ? new Date(lastUpdate).toLocaleString()
+          : "Ei tietoa"}
+      </p>
+
+      {/* Status info */}
       <p>Status: {isOnline ? "Online" : "Offline"}</p>
+
+      {/* Stale warning */}
+      {isStale && isOnline && (
+        <div
+          style={{
+            marginTop: "8px",
+            color: "#b8860b",
+            fontWeight: "bold",
+            fontSize: "12px"
+          }}
+        >
+          ⚠ Mittaus vanhentunut
+        </div>
+      )}
 
       {/* Task indicator */}
       {hasTask && (
