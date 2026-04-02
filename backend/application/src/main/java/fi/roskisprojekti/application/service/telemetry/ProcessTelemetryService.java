@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 @RequiredArgsConstructor
-
 public class ProcessTelemetryService implements ProcessTelemetryUseCase {
 
     private final MeasurementRepository measurementRepository;

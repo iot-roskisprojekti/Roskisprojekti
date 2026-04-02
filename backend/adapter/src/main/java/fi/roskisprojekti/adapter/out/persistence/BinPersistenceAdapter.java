@@ -36,7 +36,12 @@ public class BinPersistenceAdapter implements BinRepository {
     }
 
     @Override
-    public void save(Bin bin) {
-        jpaRepository.save(mapper.toJpaEntity(bin));
+    public void deleteById(BinId id) {
+        jpaRepository.deleteById(id.value());
+    }
+
+    @Override
+    public Bin save(Bin bin) {
+       return mapper.toDomainEntity(jpaRepository.save(mapper.toJpaEntity(bin)));
     }
 }

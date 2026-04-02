@@ -1,4 +1,4 @@
-package fi.roskisprojekti.adapter.in.rest;
+package fi.roskisprojekti.adapter.in.rest.controller.measurement;
 
 import java.util.List;
 

@@ -29,6 +29,7 @@ public class FindBinsService implements FindBinsUseCase {
 
     @Override
     public Bin findById(BinId id) {
-        return null;
+        return binRepository.findById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("No bin found with ID: " + id.value()));
     }
 }

@@ -1,9 +1,8 @@
-package fi.roskisprojekti.adapter.in.rest;
+package fi.roskisprojekti.adapter.in.rest.controller.bin;
 
 import fi.roskisprojekti.adapter.in.rest.dto.BinRestDto;
 import fi.roskisprojekti.adapter.in.rest.mapper.BinRestMapper;
 import fi.roskisprojekti.application.port.in.bin.FindBinsUseCase;
-import fi.roskisprojekti.domain.bin.Bin;
 import fi.roskisprojekti.domain.bin.BinId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

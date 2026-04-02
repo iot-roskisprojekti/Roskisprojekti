@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface BinRepository {
     List<Bin> findAllBins();
     Optional<Bin> findById(BinId id);
-    void save(Bin bin);
+    void deleteById(BinId id);
+    Bin save(Bin bin);
 }

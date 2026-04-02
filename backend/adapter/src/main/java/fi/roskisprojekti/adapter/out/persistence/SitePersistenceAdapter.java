@@ -1,5 +1,6 @@
 package fi.roskisprojekti.adapter.out.persistence;
 
+import fi.roskisprojekti.domain.site.SiteId;
 import lombok.RequiredArgsConstructor;
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.SiteJpaEntity;
 import fi.roskisprojekti.adapter.out.persistence.jpa.mapper.SitePersistenceMapper;
@@ -29,14 +30,14 @@ public class SitePersistenceAdapter implements SiteRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(SiteId id) {
 
-        jpaRepository.deleteById(id);
+        jpaRepository.deleteById(id.value());
     }
 
     @Override
-    public Optional<Site> findById(Long id) {
-        return jpaRepository.findById(id)
+    public Optional<Site> findById(SiteId id) {
+        return jpaRepository.findById(id.value())
                 .map(siteMapper::toDomainEntity);
     }
 
@@ -48,6 +49,7 @@ public class SitePersistenceAdapter implements SiteRepository {
 
         return siteMapper.toDomainEntity(savedEntity);
     }
+
 
 
 }
