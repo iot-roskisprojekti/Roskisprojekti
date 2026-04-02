@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import BinCard from "./BinCard";
 
 export default function Dashboard({
@@ -9,50 +9,35 @@ export default function Dashboard({
   errorMessage
 }) {
 
-  const criticalBins = containers.filter(bin => bin.fillLevel >= 85);
-  const warningBins = containers.filter(bin => bin.fillLevel >= 70 && bin.fillLevel < 85);
-  const normalBins = containers.filter(bin => bin.fillLevel < 70);
-  const offlineBins = containers.filter(bin => bin.isOnline === false);
   const totalBins = containers.length;
+  const offlineBins = containers.filter(bin => bin.isOnline === false);
 
-  const renderBinsColumn = (bins) => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-        alignItems: "center"
-      }}
-    >
-      {bins.map(bin => {
-        const hasTask = tasks?.some(
-          task => task.containerId === bin.id
-        );
+  // STATUS LOGIIKKA (yhdenmukainen koko appiin)
+  const getPriority = (bin) => {
+    if (!bin.isOnline) return 4;        // offline aina ylimmäksi
+    if (bin.fillLevel >= 85) return 3;  // kriittinen
+    if (bin.fillLevel >= 70) return 2;  // varoitus
+    return 1;                           // normaali
+  };
 
-        return (
-          <BinCard
-            key={bin.id}
-            id={bin.id}
-            name={bin.name}
-            location={bin.location}
-            fillLevel={bin.fillLevel}
-            capacity={bin.capacity}
-            lastUpdate={bin.lastUpdate}
-            isOnline={bin.isOnline}
-            hasTask={hasTask}
-          />
-        );
-      })}
-    </div>
-  );
+  const sortedContainers = useMemo(() => {
+    return [...containers].sort((a, b) => {
+      const diff = getPriority(b) - getPriority(a);
+
+      // jos sama prioriteetti-> eniten täynnä ensin
+      if (diff === 0) {
+        return (b.fillLevel || 0) - (a.fillLevel || 0);
+      }
+
+      return diff;
+    });
+  }, [containers]);
 
   return (
     <div style={{ padding: "20px" }}>
 
-      
-      {/*  DATAYHTEYS-HÄLYTYKSET */}
-      
-      {systemStatus === "offline" &&  (
+      {/* SYSTEM ALERTS */}
+      {systemStatus === "offline" && (
         <div className="alert alert-danger text-center">
           <strong>JÄRJESTELMÄ OFFLINE</strong><br />
           Yhteys backend-palvelimeen katkennut.
@@ -72,9 +57,7 @@ export default function Dashboard({
         </div>
       )}
 
-      
-      {/* OTSIKKO + PÄIVITYS */}
-      
+      {/* HEADER */}
       <div
         style={{
           display: "flex",
@@ -86,6 +69,7 @@ export default function Dashboard({
       >
         <h2 className="m-0">Tilannekuva</h2>
 
+        {/* manuaalinen päivitä säiliötiedot -nappi kommentoitu pois
         <button
           className="btn btn-primary"
           onClick={onRefresh}
@@ -93,50 +77,45 @@ export default function Dashboard({
         >
           Päivitä säiliötiedot
         </button>
+
+        */}
       </div>
 
-      
-      {/* SÄILIÖSARAKKEET */}
-     
+      {/* GRID */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: "20px"
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: "16px",
+          alignItems: "start"
         }}
       >
+        {sortedContainers.map(bin => {
+          const hasTask = tasks?.some(
+            task => task.containerId === bin.id
+          );
 
-        {/* 🔴 Kriittiset */}
-        <div>
-          <h3 style={{ color: "red", textAlign: "center" }}>
-            Kriittiset ({criticalBins.length}/{totalBins})
-          </h3>
-          {criticalBins.length > 0
-            ? renderBinsColumn(criticalBins)
-            : <p>Ei kriittisiä säiliöitä</p>}
-        </div>
+          const isCritical = !bin.isOnline ? false : bin.fillLevel >= 85;
+          const isWarning = !bin.isOnline ? false : bin.fillLevel >= 70 && bin.fillLevel < 85;
 
-        {/* 🟠 Varoitus */}
-        <div>
-          <h3 style={{ color: "orange", textAlign: "center" }}>
-            Varoitustason säiliöt ({warningBins.length}/{totalBins})
-          </h3>
-          {warningBins.length > 0
-            ? renderBinsColumn(warningBins)
-            : <p>Ei varoitustason säiliöitä</p>}
-        </div>
-
-        {/* 🟢 Normaali */}
-        <div>
-          <h3 style={{ color: "green", textAlign: "center" }}>
-            Normaalit ({normalBins.length}/{totalBins})
-          </h3>
-          {normalBins.length > 0
-            ? renderBinsColumn(normalBins)
-            : <p>Ei normaaleja säiliöitä</p>}
-        </div>
-
+          return (
+            <BinCard
+              key={bin.id}
+              id={bin.id}
+              name={bin.name}
+              location={bin.location}
+              fillLevel={bin.fillLevel}
+              capacity={bin.capacity}
+              lastUpdate={bin.lastUpdate}
+              isOnline={bin.isOnline}
+              isStale={bin.isStale}
+              hasTask={hasTask}
+              isCritical={isCritical}
+              isWarning={isWarning}
+              isOffline={!bin.isOnline}
+            />
+          );
+        })}
       </div>
     </div>
   );
