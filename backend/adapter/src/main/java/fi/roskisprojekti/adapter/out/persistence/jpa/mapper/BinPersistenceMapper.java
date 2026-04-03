@@ -2,8 +2,8 @@ package fi.roskisprojekti.adapter.out.persistence.jpa.mapper;
 
 
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.BinJpaEntity;
-import fi.roskisprojekti.domain.bin.*;
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.bin.*;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -39,5 +39,11 @@ public interface BinPersistenceMapper {
     default FillLevel mapFillLevel(java.math.BigDecimal percent) {
         return percent != null ? new FillLevel(percent.doubleValue()) : new FillLevel(0.0);
     }
-    default LastUpdated mapLastUpdated(java.time.Instant time) { return new LastUpdated(time); }
+    default LastUpdated mapLastUpdated(java.time.Instant time) {
+
+        if (time == null) {
+            return new LastUpdated(java.time.Instant.EPOCH);
+        }
+        return new LastUpdated(time);
+    }
 }

@@ -4,8 +4,8 @@ import fi.roskisprojekti.adapter.out.persistence.jpa.entity.BinJpaEntity;
 import fi.roskisprojekti.adapter.out.persistence.jpa.mapper.BinPersistenceMapper;
 import fi.roskisprojekti.adapter.out.persistence.jpa.repository.BinJpaRepository;
 import fi.roskisprojekti.application.port.out.persistence.BinRepository;
-import fi.roskisprojekti.domain.bin.Bin;
-import fi.roskisprojekti.domain.bin.BinId;
+import fi.roskisprojekti.domain.entity.bin.Bin;
+import fi.roskisprojekti.domain.entity.bin.BinId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

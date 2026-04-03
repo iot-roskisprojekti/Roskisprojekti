@@ -1,12 +1,12 @@
 package fi.roskisprojekti.adapter.out.persistence;
 
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 import lombok.RequiredArgsConstructor;
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.SiteJpaEntity;
 import fi.roskisprojekti.adapter.out.persistence.jpa.mapper.SitePersistenceMapper;
 import fi.roskisprojekti.adapter.out.persistence.jpa.repository.SiteJpaRepository;
 import fi.roskisprojekti.application.port.out.persistence.SiteRepository; // The Port
-import fi.roskisprojekti.domain.site.Site; // Pure Domain Model
+import fi.roskisprojekti.domain.entity.site.Site; // Pure Domain Model
 import org.springframework.stereotype.Component;
 
 import java.util.List;

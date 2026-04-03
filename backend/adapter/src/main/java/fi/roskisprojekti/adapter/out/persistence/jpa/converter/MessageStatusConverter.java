@@ -1,6 +1,6 @@
 package fi.roskisprojekti.adapter.out.persistence.jpa.converter;
 
-import fi.roskisprojekti.domain.message.MessageStatus;
+import fi.roskisprojekti.domain.entity.message.MessageStatus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

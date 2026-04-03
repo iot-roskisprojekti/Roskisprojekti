@@ -1,6 +1,6 @@
 package fi.roskisprojekti.application.port.out.persistence;
 
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 
 import java.util.List;
 

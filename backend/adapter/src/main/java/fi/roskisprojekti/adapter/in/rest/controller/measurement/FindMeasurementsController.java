@@ -5,7 +5,7 @@ import java.util.List;
 import fi.roskisprojekti.adapter.in.rest.dto.MeasurementRestDto;
 import fi.roskisprojekti.adapter.in.rest.mapper.MeasurementRestMapper;
 import fi.roskisprojekti.application.port.in.measurement.FindMeasurementsUseCase;
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

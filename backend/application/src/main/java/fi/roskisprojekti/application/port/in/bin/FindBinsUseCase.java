@@ -1,8 +1,8 @@
 package fi.roskisprojekti.application.port.in.bin;
 
-import fi.roskisprojekti.domain.bin.Bin;
-import fi.roskisprojekti.domain.bin.BinId;
-import fi.roskisprojekti.domain.bin.BinStatus;
+import fi.roskisprojekti.domain.entity.bin.Bin;
+import fi.roskisprojekti.domain.entity.bin.BinId;
+import fi.roskisprojekti.domain.entity.bin.BinStatus;
 
 import java.util.List;
 

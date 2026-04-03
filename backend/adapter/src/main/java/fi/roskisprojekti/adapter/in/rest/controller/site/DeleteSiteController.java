@@ -2,7 +2,7 @@ package fi.roskisprojekti.adapter.in.rest.controller.site;
 
 import fi.roskisprojekti.adapter.in.rest.mapper.SiteRestMapper;
 import fi.roskisprojekti.application.port.in.site.DeleteSitesUseCase;
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

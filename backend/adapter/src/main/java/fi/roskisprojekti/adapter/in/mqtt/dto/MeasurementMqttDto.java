@@ -10,6 +10,6 @@ import java.time.Instant;
 public record MeasurementMqttDto(
         @JsonProperty("binId") Long binId,
         @JsonProperty("distance") int distance,
-        @JsonProperty("timestamp") @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS", timezone = "UTC") Instant measuredAt
+        @JsonProperty("timestamp") Instant measuredAt
 ) {
 }

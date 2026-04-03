@@ -2,7 +2,7 @@ package fi.roskisprojekti.application.service.bin;
 
 import fi.roskisprojekti.application.port.in.bin.ModifyBinUseCase;
 import fi.roskisprojekti.application.port.out.persistence.BinRepository;
-import fi.roskisprojekti.domain.bin.Bin;
+import fi.roskisprojekti.domain.entity.bin.Bin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,10 +1,10 @@
 package fi.roskisprojekti.adapter.out.persistence.jpa.mapper;
 
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.SiteJpaEntity;
-import fi.roskisprojekti.domain.site.Location;
-import fi.roskisprojekti.domain.site.Name;
-import fi.roskisprojekti.domain.site.Site;
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.site.Location;
+import fi.roskisprojekti.domain.entity.site.Name;
+import fi.roskisprojekti.domain.entity.site.Site;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -1,6 +1,6 @@
 package fi.roskisprojekti.adapter.in.rest.dto;
 
-import fi.roskisprojekti.domain.bin.BinStatus;
+import fi.roskisprojekti.domain.entity.bin.BinStatus;
 
 import java.time.Instant;
 

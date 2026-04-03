@@ -5,7 +5,7 @@ import fi.roskisprojekti.adapter.out.persistence.jpa.entity.MeasurementJpaEntity
 import fi.roskisprojekti.adapter.out.persistence.jpa.mapper.MeasurementPersistenceMapper;
 import fi.roskisprojekti.adapter.out.persistence.jpa.repository.MeasurementJpaRepository;
 import fi.roskisprojekti.application.port.out.persistence.MeasurementRepository;
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

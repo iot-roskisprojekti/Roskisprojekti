@@ -1,6 +1,6 @@
 package fi.roskisprojekti.adapter.out.persistence.jpa.converter;
 
-import fi.roskisprojekti.domain.alert.AlertType;
+import fi.roskisprojekti.domain.entity.alert.AlertType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

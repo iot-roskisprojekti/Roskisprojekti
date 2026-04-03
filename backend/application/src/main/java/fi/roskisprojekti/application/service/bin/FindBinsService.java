@@ -2,9 +2,9 @@ package fi.roskisprojekti.application.service.bin;
 
 import fi.roskisprojekti.application.port.in.bin.FindBinsUseCase;
 import fi.roskisprojekti.application.port.out.persistence.BinRepository;
-import fi.roskisprojekti.domain.bin.Bin;
-import fi.roskisprojekti.domain.bin.BinId;
-import fi.roskisprojekti.domain.bin.BinStatus;
+import fi.roskisprojekti.domain.entity.bin.Bin;
+import fi.roskisprojekti.domain.entity.bin.BinId;
+import fi.roskisprojekti.domain.entity.bin.BinStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

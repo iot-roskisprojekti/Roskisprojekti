@@ -2,8 +2,8 @@ package fi.roskisprojekti.adapter.out.persistence.jpa.entity;
 
 import fi.roskisprojekti.adapter.out.persistence.jpa.converter.AlertStateConverter;
 import fi.roskisprojekti.adapter.out.persistence.jpa.converter.AlertTypeConverter;
-import fi.roskisprojekti.domain.alert.AlertState;
-import fi.roskisprojekti.domain.alert.AlertType;
+import fi.roskisprojekti.domain.entity.alert.AlertState;
+import fi.roskisprojekti.domain.entity.alert.AlertType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

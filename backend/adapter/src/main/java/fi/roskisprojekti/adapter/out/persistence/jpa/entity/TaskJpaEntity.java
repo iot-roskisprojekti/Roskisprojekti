@@ -1,7 +1,7 @@
 package fi.roskisprojekti.adapter.out.persistence.jpa.entity;
 
 import fi.roskisprojekti.adapter.out.persistence.jpa.converter.TaskStatusConverter;
-import fi.roskisprojekti.domain.task.TaskStatus;
+import fi.roskisprojekti.domain.entity.task.TaskStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

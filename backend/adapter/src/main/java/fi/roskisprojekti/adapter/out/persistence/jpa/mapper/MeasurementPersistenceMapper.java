@@ -3,10 +3,10 @@ package fi.roskisprojekti.adapter.out.persistence.jpa.mapper;
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.BinJpaEntity;
 import fi.roskisprojekti.adapter.out.persistence.jpa.entity.MeasurementJpaEntity;
 import fi.roskisprojekti.adapter.out.persistence.jpa.repository.BinJpaRepository;
-import fi.roskisprojekti.domain.bin.BinId;
-import fi.roskisprojekti.domain.measurement.Distance;
-import fi.roskisprojekti.domain.measurement.MeasuredAt;
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.bin.BinId;
+import fi.roskisprojekti.domain.entity.measurement.Distance;
+import fi.roskisprojekti.domain.entity.measurement.MeasuredAt;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 

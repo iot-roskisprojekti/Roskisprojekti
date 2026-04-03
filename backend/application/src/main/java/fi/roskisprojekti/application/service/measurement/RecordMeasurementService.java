@@ -2,7 +2,7 @@ package fi.roskisprojekti.application.service.measurement;
 
 import fi.roskisprojekti.application.port.in.measurement.RecordMeasurementUseCase;
 import fi.roskisprojekti.application.port.out.persistence.MeasurementRepository;
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

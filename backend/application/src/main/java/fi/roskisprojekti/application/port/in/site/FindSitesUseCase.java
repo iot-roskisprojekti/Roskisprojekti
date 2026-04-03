@@ -1,7 +1,7 @@
 package fi.roskisprojekti.application.port.in.site;
 
-import fi.roskisprojekti.domain.site.Site;
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.site.Site;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 
 import java.util.List;
 import java.util.Optional;

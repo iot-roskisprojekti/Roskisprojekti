@@ -1,6 +1,6 @@
 package fi.roskisprojekti.adapter.out.persistence.jpa.converter;
 
-import fi.roskisprojekti.domain.task.TaskStatus;
+import fi.roskisprojekti.domain.entity.task.TaskStatus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

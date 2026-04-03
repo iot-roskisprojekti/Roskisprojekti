@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 import json
 import time
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 
 client = mqtt.Client()
 
@@ -18,7 +18,7 @@ while True:
     data = {
         "binId": bin_id,
         "distance": random.randint(0, 1200),
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     }
 
     topic = f"telemetry/bins/{bin_id}"

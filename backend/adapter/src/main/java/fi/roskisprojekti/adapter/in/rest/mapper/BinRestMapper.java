@@ -1,8 +1,8 @@
 package fi.roskisprojekti.adapter.in.rest.mapper;
 
 import fi.roskisprojekti.adapter.in.rest.dto.BinRestDto;
-import fi.roskisprojekti.domain.bin.*;
-import fi.roskisprojekti.domain.site.SiteId;
+import fi.roskisprojekti.domain.entity.bin.*;
+import fi.roskisprojekti.domain.entity.site.SiteId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
