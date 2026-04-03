@@ -32,8 +32,8 @@ export default function BinCard({
   const cardBg = !isOnline
     ? "#f5f5f5"
     : isStale
-    ? "#fff8e1" // vaalea keltainen = vanhentunut data
-    : "#fff";
+      ? "#fff8e1" // vaalea keltainen = vanhentunut data
+      : "#fff";
 
   const textColor = !isOnline ? "#666" : "#000";
 
@@ -51,13 +51,22 @@ export default function BinCard({
         border: hasTask
           ? "3px solid #0d6efd"
           : isStale
-          ? "3px solid #ffc107"
-          : "3px solid transparent",
+            ? "3px solid #ffc107"
+            : "3px solid transparent",
         transition: "all 0.2s ease"
       }}
     >
       {/* Nimi */}
-      <h3 style={{ marginBottom: "0.3rem" }}>
+      <h3
+        style={{
+          marginBottom: "0.3rem",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          minHeight: "3em" // varaa tila kahdelle riville
+        }}
+      >
         {name || `Roska-astia ${id}`}
       </h3>
 
@@ -70,8 +79,8 @@ export default function BinCard({
           backgroundColor: !isOnline
             ? "#6c757d"
             : isStale
-            ? "#ffc107"
-            : status.color,
+              ? "#ffc107"
+              : status.color,
           color: "white",
           fontSize: "12px",
           fontWeight: "bold",
@@ -81,8 +90,8 @@ export default function BinCard({
         {!isOnline
           ? "Offline"
           : isStale
-          ? "Vanhentunut"
-          : status.text}
+            ? "Vanhentunut"
+            : status.text}
       </div>
 
       {/* Sijainti */}
