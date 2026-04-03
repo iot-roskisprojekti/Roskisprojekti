@@ -125,10 +125,7 @@ export default function BinCard({
       <p>Kapasiteetti: {capacity} L</p>
 
       <p>
-        Viimeksi päivitetty:{" "}
-        {lastUpdate
-          ? new Date(lastUpdate).toLocaleString()
-          : "Ei tietoa"}
+        Viimeksi päivitetty: {lastUpdate || "Ei tietoa"}
       </p>
 
       {/* Status info */}

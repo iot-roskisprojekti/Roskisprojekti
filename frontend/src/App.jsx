@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter as Router, Routes, Route, Link, NavLink } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 
@@ -21,243 +21,225 @@ export default function App() {
     warningLevel: 70,
     criticalLevel: 90,
   });
+
   const [currentTime, setCurrentTime] = useState(new Date());
-
-
-  //  Datakatkosvalmius
   const [loading, setLoading] = useState(false);
   const [systemStatus, setSystemStatus] = useState("online");
   const [errorMessage, setErrorMessage] = useState(null);
 
-  // säiliötietojen päivitys
-  useEffect(() => {
-      refreshContainers();
-      
-      // automaattinen päivitys 5s välein
-    const interval = setInterval(() => {
-      refreshContainers();
-    }, 5000);
-
-  return () => clearInterval(interval);
-  }, []);
-
-  // kellon päivitys
+  // =====================
+  // HEADER CLOCK
+  // =====================
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
   const formattedDate = currentTime.toLocaleDateString("fi-FI");
   const formattedTime = currentTime.toLocaleTimeString("fi-FI");
 
-
-  //  Automaattinen tehtävälogiikka hälytyksistä
+  // =====================
+  // AUTO REFRESH
+  // =====================
   useEffect(() => {
-    setTasks(prevTasks => {
-      let updatedTasks = [...prevTasks];
+    refreshContainers();
+    const interval = setInterval(() => {
+      refreshContainers();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-      containers.forEach(container => {
-        if (container.fillLevel >= 70) {
-
-          const exists = updatedTasks.some(
-            task => task.containerId === container.id
-          );
-
+  // =====================
+  // AUTO TASKS
+  // =====================
+  useEffect(() => {
+    setTasks(prev => {
+      const updated = [...prev];
+      containers.forEach(c => {
+        if (c.fillLevel >= 70) {
+          const exists = updated.some(t => t.containerId === c.id);
           if (!exists) {
-            updatedTasks.push({
-              id: "auto-" + container.id,
-              containerId: container.id,
-              containerName: container.location,
-              alertLevel: container.fillLevel,
-              priority: container.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
+            updated.push({
+              id: "auto-" + c.id,
+              containerId: c.id,
+              containerName: c.name,
+              alertLevel: c.fillLevel,
+              priority: c.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
               assignedTo: "Ei osoitettu",
               createdAt: new Date().toISOString()
             });
           }
         }
       });
-
-      return updatedTasks;
+      return updated;
     });
   }, [containers]);
 
-  //  Tehtävän suoritus
   const handleCompleteTask = (taskId, containerId) => {
-
     setContainers(prev =>
       prev.map(c =>
-        c.id === containerId
+        c.id === String(containerId)
           ? { ...c, fillLevel: 0 }
           : c
       )
     );
-
-    setTasks(prevTasks => {
-      const taskToComplete = prevTasks.find(t => t.id === taskId);
-
-      if (taskToComplete) {
-        setCompletedTasks(prevCompleted => {
-          const alreadyExists = prevCompleted.some(t => t.id === taskId);
-          if (alreadyExists) return prevCompleted;
-
-          return [
-            ...prevCompleted,
-            {
-              ...taskToComplete,
-              completedAt: new Date().toISOString()
-            }
-          ];
+    setTasks(prev => {
+      const task = prev.find(t => t.id === taskId);
+      if (task) {
+        setCompletedTasks(old => {
+          if (old.some(t => t.id === taskId)) return old;
+          return [...old, { ...task, completedAt: new Date().toISOString() }];
         });
       }
-
-      return prevTasks.filter(t => t.id !== taskId);
+      return prev.filter(t => t.id !== taskId);
     });
   };
 
-  //  Päivitys – nappia painamalla, hakee säiliöiden tiedot backendistä
-  const refreshContainers = async () => {
-  setLoading(true);
-  setErrorMessage(null);
-
-  // 🔽 tarkistaa onko mittaus vanhentunut
+  // =====================
+  // SAFE DATE HELPERS
+  // =====================
   const isStale = (timestamp) => {
     if (!timestamp) return true;
-
-    const now = new Date();
-    const t = new Date(timestamp);
-    const diffMinutes = (now - t) / (1000 * 60);
-
-    return diffMinutes > 10; // yli 10 min = vanhentunut
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return true;
+    return (Date.now() - d.getTime()) / 60000 > 60;
   };
 
-  try {
-    const response = await fetch("http://localhost:8080/api/sites");
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "Ei tietoa";
 
-    if (!response.ok) throw new Error("Palvelinvirhe");
+    const cleaned = String(timestamp).trim();
+    const d = new Date(cleaned);
 
-    const data = await response.json();
+    console.log("formatTimestamp input:", timestamp, "-> Date:", d, "valid:", !isNaN(d.getTime()));
 
-    const mapped = data.map(c => {
-      const timestamp = c.timestamp || new Date().toISOString(); // fallback
+    if (isNaN(d.getTime())) return "Ei tietoa";
 
-      return {
-        id: c.id.toString(),
-        name: c.name,
-        location: c.location,
-        fillLevel: c.fillPercent,
-        capacity: c.capacity,
-
-        // status frontend logiikalla
-        status:
-          c.fillPercent >= 85
-            ? "critical"
-            : c.fillPercent >= 70
-            ? "warning"
-            : "normal",
-
-        //  UUSI LOGIIKKA
-        lastUpdate: timestamp,
-        isStale: isStale(timestamp),
-
-        isOnline: true
-      };
+    return d.toLocaleString("fi-FI", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
+  };
 
-    setContainers(mapped);
-    setSystemStatus("online");
+  // =====================
+  // FETCH DATA
+  // =====================
+  const refreshContainers = async () => {
+    setLoading(true);
+    setErrorMessage(null);
 
-  } catch (error) {
-    setSystemStatus("offline");
-    setErrorMessage("Yhteys palvelimeen katkennut");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const siteRes = await fetch("http://localhost:8080/api/sites");
+      const measRes = await fetch("http://localhost:8080/api/measurements");
 
+      if (!siteRes.ok) throw new Error("Sites fetch failed");
+      if (!measRes.ok) throw new Error("Measurements fetch failed");
+
+      const sites = await siteRes.json();
+      const measurements = await measRes.json();
+
+      console.log("RAW measurements:", JSON.stringify(measurements));
+
+      const mapped = sites.map(site => {
+
+        const siteId = String(site.id ?? site.binId);
+
+        const relevant = measurements
+          .filter(m => String(m.binId) === siteId)
+          .sort((a, b) =>
+            new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime()
+          );
+
+        const m = relevant[0];
+
+        console.log("Site", siteId, "-> latest measurement:", m);
+
+        const BIN_HEIGHT = 100;
+
+        const fill = m?.distance != null
+          ? Math.max(0, Math.min(100, ((BIN_HEIGHT - m.distance) / BIN_HEIGHT) * 100))
+          : null;
+
+        const timestamp = m?.measuredAt ?? null;
+
+        console.log("Site", siteId, "-> timestamp raw:", timestamp, "-> formatted:", formatTimestamp(timestamp));
+
+        return {
+          id: siteId,
+          name: site.name,
+          location: site.location,
+          capacity: site.capacity,
+          fillLevel: fill ?? 0,
+          status: fill == null
+            ? "offline"
+            : fill >= 85
+              ? "critical"
+              : fill >= 70
+                ? "warning"
+                : "normal",
+          lastUpdate: formatTimestamp(timestamp),
+          isStale: isStale(timestamp),
+          isOnline: !!m
+        };
+      });
+
+      setContainers(mapped);
+
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err.message);
+      setSystemStatus("offline");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Router>
       <div className="app">
         <header className="header">
 
-          {/* YLÄRIVI */}
           <div className="position-relative d-flex align-items-center px-3">
-
-            {/* KESKELLE */}
             <div className="header-title position-absolute top-50 start-50 translate-middle text-center">
               <h1>Älykäs jäteastioiden seuranta</h1>
               <p>Pilotissa 5 kohdetta</p>
             </div>
-
-            {/* OIKEA REUNA */}
             <div className="ms-auto text-end">
               <div>{formattedDate}</div>
               <div>{formattedTime}</div>
             </div>
-
           </div>
 
-
-
-          {/* ALARIVI (NAVBAR) */}
           <nav className="navbar navbar-expand-lg bg-body-tertiary mt-3">
             <div className="container-fluid">
-              <button
-                className="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNavAltMarkup"
-              >
-                <span className="navbar-toggler-icon"></span>
-              </button>
-
-              <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-
-                {/* Keskellä navigointi */}
-                <div className="navbar-nav justify-content-center w-100">
-                  <NavLink to="/" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
-                    Tilannekuva
-                  </NavLink>
-                  <NavLink to="/tehtavat" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
-                    Työtehtävät
-                  </NavLink>
-                  <NavLink to="/sailiot" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
-                    Säiliöt
-                  </NavLink>
-                  <NavLink to="/raportit" className={({ isActive }) => "nav-link mx-3 " + (isActive ? "active-link" : "")}>
-                    Raportit
-                  </NavLink>
-                </div>
-
-                {/* Oikeaan reunaan asetukset */}
-                <div className="d-flex">
-                  <div className="dropdown">
-                    <button
-                      className="btn btn-link nav-link dropdown-toggle"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                    >
-                      <FaCog size={20} />
-                    </button>
-
-                    <ul className="dropdown-menu dropdown-menu-end">
-                      <li>
-                        <Link className="dropdown-item" to="/asetukset/yhteystiedot">
-                          Ilmoitusten vastaanottajat
-                        </Link>
-                      </li>
-                      <li>
-                        <Link className="dropdown-item" to="/asetukset/halytysrajat">
-                          Hälytysrajat
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
+              <div className="navbar-nav justify-content-center w-100">
+                <NavLink to="/" className="nav-link mx-3">Tilannekuva</NavLink>
+                <NavLink to="/tehtavat" className="nav-link mx-3">Työtehtävät</NavLink>
+                <NavLink to="/sailiot" className="nav-link mx-3">Säiliöt</NavLink>
+                <NavLink to="/raportit" className="nav-link mx-3">Raportit</NavLink>
+              </div>
+              <div className="dropdown">
+                <button className="btn btn-link nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                  <FaCog size={20} />
+                </button>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <Link className="dropdown-item" to="/asetukset/yhteystiedot">
+                      Ilmoitusten vastaanottajat
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/asetukset/halytysrajat">
+                      Hälytysrajat
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
           </nav>
@@ -270,7 +252,6 @@ export default function App() {
               <Dashboard
                 containers={containers}
                 tasks={tasks}
-                onRefresh={refreshContainers} // <-- nappi Dashboardissa kutsuu tätä
                 loading={loading}
                 systemStatus={systemStatus}
                 errorMessage={errorMessage}
@@ -287,10 +268,7 @@ export default function App() {
             } />
             <Route path="/asetukset/yhteystiedot" element={<NotificationSettings />} />
             <Route path="/asetukset/halytysrajat" element={
-              <AlertSettings
-                alertSettings={alertSettings}
-                setAlertSettings={setAlertSettings}
-              />
+              <AlertSettings alertSettings={alertSettings} setAlertSettings={setAlertSettings} />
             } />
           </Routes>
         </main>
