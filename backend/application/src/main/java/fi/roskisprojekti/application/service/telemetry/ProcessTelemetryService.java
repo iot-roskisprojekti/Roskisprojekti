@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import fi.roskisprojekti.application.port.in.telemetry.ProcessTelemetryUseCase;
 import fi.roskisprojekti.application.port.out.persistence.BinRepository;
 import fi.roskisprojekti.application.port.out.persistence.MeasurementRepository;
-import fi.roskisprojekti.domain.bin.Bin;
-import fi.roskisprojekti.domain.bin.BinId;
-import fi.roskisprojekti.domain.measurement.Distance;
-import fi.roskisprojekti.domain.measurement.MeasuredAt;
-import fi.roskisprojekti.domain.measurement.Measurement;
+import fi.roskisprojekti.domain.entity.bin.Bin;
+import fi.roskisprojekti.domain.entity.bin.BinId;
+import fi.roskisprojekti.domain.entity.measurement.Distance;
+import fi.roskisprojekti.domain.entity.measurement.MeasuredAt;
+import fi.roskisprojekti.domain.entity.measurement.Measurement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -26,13 +26,13 @@ public class ProcessTelemetryService implements ProcessTelemetryUseCase {
                 .orElseThrow(() -> new RuntimeException("Bin not found: " + binId));
 
 
-        Measurement measurement = new Measurement(
-                new BinId(binId),
+        Measurement measurement = Measurement.createWithoutId(
+                bin.getBinId(),
                 new Distance(distance),
                 new MeasuredAt(measuredAt)
-        );
+                );
 
-        bin.updateFillLevelFromCensor(measurement.getDistance());
+        bin.updateFillLevelFromCensor(measurement.getDistance(), measuredAt);
 
 
         measurementRepository.save(measurement);
