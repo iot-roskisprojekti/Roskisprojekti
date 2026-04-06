@@ -131,74 +131,55 @@ export default function App() {
   // FETCH DATA
   // =====================
   const refreshContainers = async () => {
-    setLoading(true);
-    setErrorMessage(null);
+  setLoading(true);
+  setErrorMessage(null);
 
-    try {
-      const siteRes = await fetch("http://localhost:8080/api/sites");
-      const measRes = await fetch("http://localhost:8080/api/measurements");
+  try {
+    const [siteRes, binRes] = await Promise.all([
+      fetch("http://localhost:8080/api/sites"),
+      fetch("http://localhost:8080/api/bins")
+    ]);
 
-      if (!siteRes.ok) throw new Error("Sites fetch failed");
-      if (!measRes.ok) throw new Error("Measurements fetch failed");
+    if (!siteRes.ok) throw new Error("Sites fetch failed");
+    if (!binRes.ok) throw new Error("Bins fetch failed");
 
-      const sites = await siteRes.json();
-      const measurements = await measRes.json();
+    const sites = await siteRes.json();
+    const bins = await binRes.json();
 
-      console.log("RAW measurements:", JSON.stringify(measurements));
+    const mapped = bins.map(bin => {
+      const site = sites.find(s => String(s.id) === String(bin.siteId));
 
-      const mapped = sites.map(site => {
+      const fill = Number(bin.fillLevel ?? 0);
 
-        const siteId = String(site.id ?? site.binId);
+      return {
+        id: String(bin.binId),
+        name: site?.name ?? bin.name ?? `Bin ${bin.binId}`,
+        location: site?.location ?? "Ei tietoa",
+        capacity: site?.capacity ?? "",
+        fillLevel: fill,
+        status:
+          bin.status === "CRITICAL"
+            ? "critical"
+            : bin.status === "WARNING"
+              ? "warning"
+              : "normal",
+        lastUpdate: formatTimestamp(bin.lastUpdated),
+        isStale: isStale(bin.lastUpdated),
+        isOnline: true
+      };
+    });
 
-        const relevant = measurements
-          .filter(m => String(m.binId) === siteId)
-          .sort((a, b) =>
-            new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime()
-          );
+    setContainers(mapped);
+    setSystemStatus("online");
 
-        const m = relevant[0];
-
-        console.log("Site", siteId, "-> latest measurement:", m);
-
-        const BIN_HEIGHT = 100;
-
-        const fill = m?.distance != null
-          ? Math.max(0, Math.min(100, ((BIN_HEIGHT - m.distance) / BIN_HEIGHT) * 100))
-          : null;
-
-        const timestamp = m?.measuredAt ?? null;
-
-        console.log("Site", siteId, "-> timestamp raw:", timestamp, "-> formatted:", formatTimestamp(timestamp));
-
-        return {
-          id: siteId,
-          name: site.name,
-          location: site.location,
-          capacity: site.capacity,
-          fillLevel: fill ?? 0,
-          status: fill == null
-            ? "offline"
-            : fill >= 85
-              ? "critical"
-              : fill >= 70
-                ? "warning"
-                : "normal",
-          lastUpdate: formatTimestamp(timestamp),
-          isStale: isStale(timestamp),
-          isOnline: !!m
-        };
-      });
-
-      setContainers(mapped);
-
-    } catch (err) {
-      console.error(err);
-      setErrorMessage(err.message);
-      setSystemStatus("offline");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    console.error(err);
+    setErrorMessage(err.message);
+    setSystemStatus("offline");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Router>
