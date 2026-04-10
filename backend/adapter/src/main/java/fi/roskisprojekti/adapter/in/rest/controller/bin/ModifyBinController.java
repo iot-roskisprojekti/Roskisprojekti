@@ -19,7 +19,6 @@ public class ModifyBinController {
     @PutMapping("/{id}")
     public BinRestDto modifyBin(@PathVariable Long id, @RequestBody BinRestDto binDto) {
         Bin domainBin = binRestMapper.toDomainEntity(binDto);
-        // Ensure ID consistency if binDto.binId is null or mismatch
         Bin updatedBin = modifyBinUseCase.modifyBin(domainBin);
         return binRestMapper.toRestDto(updatedBin);
     }

@@ -1,21 +1,24 @@
 package fi.roskisprojekti.adapter.in.rest.mapper;
 
 import fi.roskisprojekti.adapter.in.rest.dto.BinRestDto;
+import fi.roskisprojekti.domain.common.SingleTimeStamp;
 import fi.roskisprojekti.domain.entity.bin.*;
 import fi.roskisprojekti.domain.entity.site.SiteId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.time.Instant;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface BinRestMapper {
 
     @Mapping(target = "binId", source = "binId.value")
     @Mapping(target = "siteId", source = "siteId.value")
     @Mapping(target = "fillLevel", source = "fillLevel.percent")
-    @Mapping(target = "status", expression = "java(bin.getStatus())")
+    @Mapping(target = "status", source = "binStatus")
     @Mapping(target = "lastUpdated", source = "lastUpdated.value")
+    @Mapping(target = "name", source = "name.value")
     BinRestDto toRestDto(Bin bin);
 
     @Mapping(target = "binId", source = "binId")
@@ -41,7 +44,7 @@ public interface BinRestMapper {
         return value != null ? new FillLevel(value) : null;
     }
 
-    default LastUpdated mapLastUpdated(Instant value) {
-        return value != null ? new LastUpdated(value) : null;
+    default SingleTimeStamp mapLastUpdated(Instant value) {
+        return value != null ? new SingleTimeStamp(value) : null;
     }
 }

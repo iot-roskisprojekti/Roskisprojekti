@@ -15,13 +15,13 @@ public class DomainValidator {
             throw new DomainValidationException(fieldName + " must be a positive number");
         }
     }
-    public static void isValidTimeStamp(Instant value, String fieldName) {
+    public static void isValidTimeStamp(Instant value) {
         if (value == null) {
-            throw new DomainValidationException(fieldName + " can't be null");
+            throw new DomainValidationException("Timestamp can't be null");
         }
 
         if (value.isAfter(Instant.now())) {
-            throw new DomainValidationException(fieldName + " timestamp can't be in the future");
+            throw new DomainValidationException("Timestamp can't be in the future");
         }
 
     }

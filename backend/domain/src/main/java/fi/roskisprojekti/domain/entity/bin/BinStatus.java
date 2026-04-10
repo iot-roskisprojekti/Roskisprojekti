@@ -4,6 +4,7 @@ package fi.roskisprojekti.domain.entity.bin;
 public enum BinStatus {
     OK,
     WARNING,
-    CRITICAL
+    NEEDS_EMPTYING,
+    STALE_TELEMETRY
 
 }
