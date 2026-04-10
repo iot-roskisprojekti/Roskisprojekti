@@ -1,5 +1,5 @@
 package fi.roskisprojekti.adapter.in.rest.controller.bin;
-
+/**
 import fi.roskisprojekti.application.port.in.dto.BinHistoryDto;
 import fi.roskisprojekti.application.service.measurement.GetBinHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -18,3 +18,4 @@ public class GetBinHistoryController {
         return service.getHistory(id);
     }
 }
+*/

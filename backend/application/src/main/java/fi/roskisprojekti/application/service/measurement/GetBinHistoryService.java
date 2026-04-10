@@ -1,5 +1,5 @@
 package fi.roskisprojekti.application.service.measurement;
-
+/**
 import fi.roskisprojekti.application.port.out.persistence.MeasurementRepository;
 import fi.roskisprojekti.application.port.in.dto.BinHistoryDto;
 import fi.roskisprojekti.application.port.in.dto.HistoryPoint;
@@ -67,3 +67,4 @@ public class GetBinHistoryService {
 
     
 }
+*/
