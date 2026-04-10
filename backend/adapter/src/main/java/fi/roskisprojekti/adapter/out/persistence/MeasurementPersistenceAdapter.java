@@ -33,4 +33,13 @@ public class MeasurementPersistenceAdapter implements MeasurementRepository {
                 .map(mapper::toDomainEntity)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Measurement> findByBinIdOrderByTimestampAsc(Long binId) {
+        return jpaRepository.findByBinJpaEntity_IdOrderByMeasuredAtAsc(binId)
+                .stream()
+                .map(mapper::toDomainEntity)
+                .toList();
+}
+
 }
