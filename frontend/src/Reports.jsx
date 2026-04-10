@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
+
+
+/* Tietokanta mahdollistaa esimerkiksi seuraavien asioiden raportoimisen käyttöliittymässä: 
+• Säiliöiden keskimääräinen täyttöaste 
+• Hälytysten määrä 
+• Säiliökohtaisen historiallinen data 
+• Työtehtävien käsittelyaika */
+
+
+
 export default function Reports({ containers = [], completedTasks = [] }) {
 
   const [selectedContainer, setSelectedContainer] = useState(
@@ -8,9 +18,9 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   );
 
   const [containerHistory, setContainerHistory] = useState([]);
-  const [emptyHistory, setEmptyHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Päivitä valittu säiliö, kun containers muuttuu
   useEffect(() => {
     if (containers.length > 0) {
       setSelectedContainer(containers[0]);
@@ -20,42 +30,6 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   if (!containers || containers.length === 0) return <p>Ei säiliödataa</p>;
   if (!selectedContainer) return <p>Ladataan...</p>;
 
-  // Simulaatio vain fallbackiksi
-  const generateDailyHistory = (fillLevel) => {
-    const days = 14;
-    let history = [];
-    let fill = Math.max(0, fillLevel - 50);
-
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const timestamp = `${date.getDate()}.${date.getMonth() + 1}`;
-
-      fill += Math.floor(Math.random() * 50);
-      if (fill > 100) fill = 100;
-
-      history.push({ timestamp, fillLevel: fill });
-    }
-
-    return history;
-  };
-
-  const generateEmptyHistory = () => {
-    const days = 14;
-    let history = [];
-
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const timestamp = `${date.getDate()}.${date.getMonth() + 1}`;
-
-      const emptied = Math.random() < 0.3 ? 1 : 0;
-      history.push({ timestamp, emptied });
-    }
-
-    return history;
-  };
-
   // Hae historia backendistä
   useEffect(() => {
     if (!selectedContainer) return;
@@ -64,24 +38,29 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const fetchHistory = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const response = await fetch(
-          `http://localhost:8080/api/containers/${selectedContainer.id}/history`,
+          `http://localhost:8080/api/bins/${selectedContainer.id}/history`,
           { signal: controller.signal }
         );
 
         if (!response.ok) throw new Error("Palvelinvirhe");
 
         const data = await response.json();
-        setContainerHistory(data.history);
-        setEmptyHistory(data.emptyHistory);
 
-      } catch (error) {
-        console.error("Backend-virhe, käytetään simulaatiota:", error);
-        setContainerHistory(generateDailyHistory(selectedContainer.fillLevel));
-        setEmptyHistory(generateEmptyHistory());
+        setContainerHistory(data.history || []);
+
+      } catch (err) {
+        console.error("Backend-virhe:", err);
+        setError("Datan haku epäonnistui");
+        setContainerHistory([]);
+        setEmptyHistory([]);
       } finally {
         clearTimeout(timeoutId);
+        setLoading(false);
       }
     };
 
@@ -89,7 +68,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
 
   }, [selectedContainer]);
 
-  // Tilastolaskennat
+  // Tilastot
   const fillLevels = containerHistory.map(h => h.fillLevel);
   const averageFill = fillLevels.length
     ? Math.round(fillLevels.reduce((sum, val) => sum + val, 0) / fillLevels.length)
@@ -97,10 +76,10 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   const maxFill = fillLevels.length ? Math.max(...fillLevels) : 0;
   const minFill = fillLevels.length ? Math.min(...fillLevels) : 0;
   const criticalDays = fillLevels.filter(val => val > 80).length;
-  const emptiedDays = emptyHistory.filter(h => h.emptied).length;
+  const emptiedDays = containerHistory.filter(h => h.emptied).length;
   const alertCount = containerHistory.filter(h => h.fillLevel >= 70).length;
 
-  // Työtehtävien käsittelyaika valitulle säiliölle
+  // Työtehtävien käsittelyaika
   const filteredCompletedTasks = completedTasks.filter(
     task => task.containerId === selectedContainer.id
   );
@@ -141,7 +120,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
         <select
           value={selectedContainer?.id || ""}
           onChange={(e) => {
-            const found = containers.find(c => c.id === e.target.value);
+            const found = containers.find(c => String(c.id) === e.target.value);
             if (found) setSelectedContainer(found);
           }}
           className="border px-2 py-1 rounded"
@@ -154,29 +133,41 @@ export default function Reports({ containers = [], completedTasks = [] }) {
         </select>
       </div>
 
-      {/* Trendikaavio */}
-      <div className="w-full max-w-3xl p-4 bg-white rounded shadow">
-        <h3 className="font-semibold mb-4 text-center">Täyttöasteen trendi (14 pv)</h3>
-        <LineChart width={600} height={300} data={containerHistory}>
-          <XAxis dataKey="timestamp" />
-          <YAxis unit="%" domain={[0, 100]} />
-          <Tooltip />
-          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-          <Line type="monotone" dataKey="fillLevel" stroke="#646cff" />
-        </LineChart>
-      </div>
+      {/* Status */}
+      {loading && <p>Ladataan dataa...</p>}
+      {error && <p className="text-red-500">{error}</p>}
 
-      {/* Tilastoanalyysi */}
-      <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
-        <h3 className="font-semibold mb-2">{selectedContainer.location} – analyysi</h3>
-        <p>Keskimääräinen täyttöaste: {averageFill}%</p>
-        <p>Minimi: {minFill}%</p>
-        <p>Maksimi: {maxFill}%</p>
-        <p>Kriittiset päivät: {criticalDays}</p>
-        <p>Hälytyksiä yhteensä: {alertCount}</p>
-        <p>Tyhjennykset (14 pv): {emptiedDays}</p>
-        {averageHandlingTime && <p>Keskimääräinen käsittelyaika: {averageHandlingTime} h</p>}
-      </div>
+      {/* Trendikaavio */}
+      {!loading && containerHistory.length > 0 && (
+        <div className="w-full max-w-3xl p-4 bg-white rounded shadow">
+          <h3 className="font-semibold mb-4 text-center">Täyttöasteen trendi (14 pv)</h3>
+          <LineChart width={600} height={300} data={containerHistory}>
+            <XAxis dataKey="date" />
+            <YAxis unit="%" domain={[0, 100]} />
+            <Tooltip />
+            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+            <Line type="monotone" dataKey="fillLevel" stroke="#646cff" />
+          </LineChart>
+        </div>
+      )}
+
+      {/* Tilastot */}
+      {!loading && containerHistory.length > 0 && (
+        <div className="w-full max-w-md p-4 bg-white rounded shadow text-center space-y-2">
+          <h3 className="font-semibold mb-2">{selectedContainer.location} – analyysi</h3>
+          <p>Keskimääräinen täyttöaste: {averageFill}%</p>
+          <p>Minimi: {minFill}%</p>
+          <p>Maksimi: {maxFill}%</p>
+          <p>Kriittiset päivät: {criticalDays}</p>
+          <p>Hälytyksiä yhteensä: {alertCount}</p>
+          <p>Tyhjennykset (14 pv): {emptiedDays}</p>
+          {averageHandlingTime && <p>Keskimääräinen käsittelyaika: {averageHandlingTime}</p>}
+        </div>
+      )}
+
+      {!loading && containerHistory.length === 0 && !error && (
+        <p>Ei historiadataa saatavilla</p>
+      )}
     </section>
   );
 }
