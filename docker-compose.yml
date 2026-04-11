@@ -12,6 +12,10 @@ services:
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/app/config/
       - SPRING_PROFILES_ACTIVE=docker
+      - MAIL_USERNAME=${MAIL_USERNAME}  # Lisää tämä
+      - MAIL_PASSWORD=${MAIL_PASSWORD}  # Lisää tämä
+
+      
     depends_on:
       db:
         condition: service_healthy
