@@ -1,10 +1,12 @@
 package fi.roskisprojekti.application.service.measurement;
-/**
-import fi.roskisprojekti.application.port.out.persistence.MeasurementRepository;
+
+import fi.roskisprojekti.application.port.out.persistence.BinTelemetryRepository;
 import fi.roskisprojekti.application.port.in.dto.BinHistoryDto;
 import fi.roskisprojekti.application.port.in.dto.HistoryPoint;
-import fi.roskisprojekti.domain.entity.measurement.Measurement;
-import fi.roskisprojekti.domain.entity.measurement.Distance;
+import fi.roskisprojekti.domain.entity.bin.BinId;
+
+import fi.roskisprojekti.domain.entity.telemetry.bin.BinTelemetry;
+import fi.roskisprojekti.domain.entity.telemetry.bin.Distance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +24,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GetBinHistoryService {
 
-    private final MeasurementRepository measurementRepository;
+    private final BinTelemetryRepository binTelemetryRepository;
 
-    public BinHistoryDto getHistory(Long binId) {
+    public BinHistoryDto getHistory(BinId binId) {
 
-        List<Measurement> measurements =
-                measurementRepository.findByBinIdOrderByTimestampAsc(binId);
+        List<BinTelemetry> measurements =
+                binTelemetryRepository.findByBinIdOrderByTimestampAsc(binId);
 
-        Map<LocalDate, List<Measurement>> grouped =
+        Map<LocalDate, List<BinTelemetry>> grouped =
                 measurements.stream()
                         .collect(Collectors.groupingBy(
                                 m -> m.getMeasuredAt().value()
@@ -42,7 +44,7 @@ public class GetBinHistoryService {
         for (var entry : grouped.entrySet()) {
 
             LocalDate date = entry.getKey();
-            List<Measurement> day = entry.getValue();
+            List<BinTelemetry> day = entry.getValue();
 
             int avgFill = (int) day.stream()
                     .mapToInt(m -> convertDistanceToFillLevel(m.getDistance()))
@@ -67,4 +69,3 @@ public class GetBinHistoryService {
 
     
 }
-*/

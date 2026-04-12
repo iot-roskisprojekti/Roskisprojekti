@@ -9,5 +9,6 @@ public interface BinTelemetryRepository {
     void save(BinTelemetry telemetry);
     List<BinTelemetry> findAllBinTelemetry();
     List<BinTelemetry> findAllTelemetryByBinId(BinId bindId);
+    List<BinTelemetry> findByBinIdOrderByTimestampAsc(BinId binId);
 
 }

@@ -44,4 +44,12 @@ public class BinTelemetryPersistenceAdapater implements BinTelemetryRepository {
                 .map(binTelemetryMapper::toDomainEntity)
                 .toList();
     }
+
+    @Override
+    public List<BinTelemetry> findByBinIdOrderByTimestampAsc(BinId binId) {
+        List<MeasurementJpaEntity> measurementJpaEntities = measurementJpaRepository.findByBinJpaEntity_IdOrderByMeasuredAtAsc(binId.value());
+        return measurementJpaEntities.stream()
+                .map(binTelemetryMapper::toDomainEntity)
+                .toList();
+    }
 }
