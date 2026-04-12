@@ -7,11 +7,11 @@ INSERT INTO employee (name, email, phone) VALUES
 
 -- 2. Sites (Kohteet)
 INSERT INTO site (name, location) VALUES
-                                      ('Kuopion Tori', '62.8924, 27.6770'),
-                                      ('Matkus Shopping Center', '62.8250, 27.6140'),
-                                      ('Puijo Tower', '62.9094, 27.6554'),
-                                      ('University of Eastern Finland', '62.8921, 27.6321'),
-                                      ('Kuopio Railway Station', '62.8979, 27.6852');
+                                      ('Kuopion Tori', 'Katu 1'),
+                                      ('Matkus Shopping Center', 'Katu 2'),
+                                      ('Puijo Tower', 'Katu 3'),
+                                      ('University of Eastern Finland', 'Katu 4'),
+                                      ('Kuopio Railway Station', 'Katu 5');
 
 -- 3. Bins (Säiliöt) - One bin per pilot site
 INSERT INTO bin (site_id, name, capacity_liters) VALUES
