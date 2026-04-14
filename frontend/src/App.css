@@ -77,20 +77,20 @@
   font-weight: 600;
 }
 
-/* Liukuva underline */
-.nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  height: 3px;
-  width: 0;
-  background: #000;
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
+
 
 /* Aktiivinen = viiva näkyy */
 .active-link::after {
   width: 100%;
 }
+
+.custom-navbar {
+  background-color: #03895e; /* navbar väri */
+}
+
+.custom-navbar .nav-link {
+  color: #ffffff;
+}
+
+
+

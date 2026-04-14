@@ -197,7 +197,7 @@ export default function App() {
             </div>
           </div>
 
-          <nav className="navbar navbar-expand-lg bg-body-tertiary mt-3">
+          <nav className="navbar navbar-expand-lg custom-navbar mt-3">
             <div className="container-fluid">
               <div className="navbar-nav justify-content-center w-100">
                 <NavLink to="/" className="nav-link mx-3">Tilannekuva</NavLink>
