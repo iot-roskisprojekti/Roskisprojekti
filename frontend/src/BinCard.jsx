@@ -49,7 +49,7 @@ export default function BinCard({
         textAlign: "center",
         margin: "0.5rem",
         border: hasTask
-          ? "3px solid #0d6efd"
+          ? "3px solid #0d0d0d"
           : isStale
             ? "3px solid #ffc107"
             : "3px solid transparent",
@@ -150,7 +150,7 @@ export default function BinCard({
         <div
           style={{
             marginTop: "10px",
-            color: "#0d6efd",
+            color: "#0d0d0d",
             fontWeight: "bold"
           }}
         >
