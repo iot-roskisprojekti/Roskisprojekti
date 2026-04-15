@@ -155,7 +155,7 @@ export default function App() {
         id: String(bin.binId),
         name: site?.name ?? bin.name ?? `Bin ${bin.binId}`,
         location: site?.location ?? "Ei tietoa",
-        capacity: site?.capacity ?? "",
+        capacity: bin?.capacityLiters ?? "",
         fillLevel: fill,
         status:
           bin.status === "CRITICAL"

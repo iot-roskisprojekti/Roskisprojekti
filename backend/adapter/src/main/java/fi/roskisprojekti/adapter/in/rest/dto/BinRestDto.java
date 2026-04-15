@@ -9,6 +9,7 @@ public record BinRestDto(
         Long siteId,
         String name,
         Double fillLevel,
+        Double capacityLiters,
         BinStatus status,
         Instant lastUpdated
 ) {}

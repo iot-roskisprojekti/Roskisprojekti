@@ -16,6 +16,7 @@ public interface BinRestMapper {
     @Mapping(target = "binId", source = "binId.value")
     @Mapping(target = "siteId", source = "siteId.value")
     @Mapping(target = "fillLevel", source = "fillLevel.percent")
+    @Mapping(target = "capacityLiters", source = "capacity.value")
     @Mapping(target = "status", source = "binStatus")
     @Mapping(target = "lastUpdated", source = "lastUpdated.value")
     @Mapping(target = "name", source = "name.value")
