@@ -141,7 +141,7 @@ export default function NotificationSettings() {
           onChange={handleChange}
         />
 
-        <button className="btn btn-primary me-2" type="submit">
+        <button className="btn btn-success btn-sm" type="submit">
           {isEditing ? "Tallenna muutokset" : "Lisää yhteystieto"}
         </button>
 
