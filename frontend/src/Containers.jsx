@@ -30,6 +30,8 @@ export default function Containers({ containers, setContainers }) {
 
   // Tallenna muokkaukset backendille
   const saveChanges = async () => {
+    console.log("editingId:", editingId, "tyyppi:", typeof editingId);
+    console.log("editedData:", editedData);
     try {
       const response = await fetch(`http://localhost:8080/api/sites/${editingId}`, {
         method: "PUT",
@@ -40,6 +42,8 @@ export default function Containers({ containers, setContainers }) {
           capacity: editedData.capacity,
         }),
       });
+
+      console.log("Response status:", response.status);
 
       if (!response.ok) throw new Error("Muokkaus epäonnistui");
 
@@ -98,6 +102,7 @@ export default function Containers({ containers, setContainers }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: editingId,
           name: newContainer.name,
           location: newContainer.location,
           capacity: newContainer.capacity,
@@ -136,7 +141,7 @@ export default function Containers({ containers, setContainers }) {
       default: return status;
     }
   };
-console.log(containers);
+  console.log(containers);
 
   // JSX
   return (
@@ -147,14 +152,14 @@ console.log(containers);
       <div className="card mb-4 p-3" style={{ maxWidth: "400px" }}>
         <h5>Lisää uusi säiliö</h5>
         <div className="mb-2">
-        <label>Nimi</label>
-        <input
-          name="name"
-          placeholder="Nimi"
-          value={newContainer.name}
-          onChange={handleNewChange}
-          className="form-control mb-2"
-        />
+          <label>Nimi</label>
+          <input
+            name="name"
+            placeholder="Nimi"
+            value={newContainer.name}
+            onChange={handleNewChange}
+            className="form-control mb-2"
+          />
           <label>Sijainti</label>
           <input
             name="location"
@@ -207,8 +212,8 @@ console.log(containers);
                 ) : (
                   c.name
                 )}
-                </td>
-                <td>
+              </td>
+              <td>
                 {editingId === c.id ? (
                   <input
                     name="location"

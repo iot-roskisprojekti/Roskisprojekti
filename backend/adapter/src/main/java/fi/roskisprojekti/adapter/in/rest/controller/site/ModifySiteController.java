@@ -20,8 +20,12 @@ public class ModifySiteController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public SiteRestDto modifySite(@PathVariable Long id, @RequestBody SiteRestDto siteDto) {
-
+        System.out.println("Modifying site id: " + id + ", dto id: " + siteDto.id());
+        System.out.println("PATH id: " + id);
+        System.out.println("DTO id: " + siteDto.id());
+        System.out.println("DTO name: " + siteDto.name());
         Site domainSite = siteRestMapper.toDomainEntity(siteDto);
+        System.out.println("Domain siteId: " + domainSite.getSiteId());
 
         return siteRestMapper.toRestDto(modifySiteUseCase.modifySite(domainSite));
     }

@@ -131,55 +131,64 @@ export default function App() {
   // FETCH DATA
   // =====================
   const refreshContainers = async () => {
-  setLoading(true);
-  setErrorMessage(null);
+    setLoading(true);
+    setErrorMessage(null);
 
-  try {
-    const [siteRes, binRes] = await Promise.all([
-      fetch("http://localhost:8080/api/sites"),
-      fetch("http://localhost:8080/api/bins")
-    ]);
+    try {
+      const [siteRes, binRes] = await Promise.all([
+        fetch("http://localhost:8080/api/sites"),
+        fetch("http://localhost:8080/api/bins")
+      ]);
 
-    if (!siteRes.ok) throw new Error("Sites fetch failed");
-    if (!binRes.ok) throw new Error("Bins fetch failed");
+      if (!siteRes.ok) throw new Error("Sites fetch failed");
+      if (!binRes.ok) throw new Error("Bins fetch failed");
 
-    const sites = await siteRes.json();
-    const bins = await binRes.json();
+      const sites = await siteRes.json();
+      const bins = await binRes.json();
 
-    const mapped = bins.map(bin => {
-      const site = sites.find(s => String(s.id) === String(bin.siteId));
+      const fromBins = bins.map(bin => {
+        const site = sites.find(s => String(s.id) === String(bin.siteId));
+        const fill = Number(bin.fillLevel ?? 0);
 
-      const fill = Number(bin.fillLevel ?? 0);
+        return {
+          id: String(bin.siteId),
+          name: site?.name ?? bin.name ?? `Bin ${bin.binId}`,
+          location: site?.location ?? "Ei tietoa",
+          capacity: bin.capacityLiters ?? "",
+          fillLevel: fill,
+          status: bin.status === "CRITICAL" ? "critical" : bin.status === "WARNING" ? "warning" : "normal",
+          lastUpdate: formatTimestamp(bin.lastUpdated),
+          isStale: isStale(bin.lastUpdated),
+          isOnline: true
+        };
+      });
 
-      return {
-        id: String(bin.binId),
-        name: site?.name ?? bin.name ?? `Bin ${bin.binId}`,
-        location: site?.location ?? "Ei tietoa",
-        capacity: bin?.capacityLiters ?? "",
-        fillLevel: fill,
-        status:
-          bin.status === "CRITICAL"
-            ? "critical"
-            : bin.status === "WARNING"
-              ? "warning"
-              : "normal",
-        lastUpdate: formatTimestamp(bin.lastUpdated),
-        isStale: isStale(bin.lastUpdated),
-        isOnline: true
-      };
-    });
+      // Lisää sitet joilla ei ole biniä
+      const siteIdsWithBins = new Set(bins.map(b => String(b.siteId)));
+      const fromSitesOnly = sites
+        .filter(s => !siteIdsWithBins.has(String(s.id)))
+        .map(s => ({
+          id: String(s.id),
+          name: s.name,
+          location: s.location,
+          capacity: "",
+          fillLevel: 0,
+          status: "normal",
+          lastUpdate: "Ei tietoa",
+          isStale: true,
+          isOnline: false
+        }));
+      setContainers([...fromBins, ...fromSitesOnly]);
+      setSystemStatus("online");
 
-    setContainers(mapped);
-    setSystemStatus("online");
-
-  } catch (err) {
-    console.error(err);
-    setErrorMessage(err.message);
-    setSystemStatus("offline");
-  } finally {
-    setLoading(false);
-  }
-};
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err.message);
+      setSystemStatus("offline");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Router>
