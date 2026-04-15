@@ -10,7 +10,7 @@ export default function NotificationSettings() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  {/*api kutsut backendille
+  //api kutsut backendille
 
   const API_URL = "http://localhost:8080/api/contacts";
 
@@ -22,7 +22,7 @@ export default function NotificationSettings() {
       .catch(err => console.error("Virhe haussa:", err));
   }, []);
 
-*/}
+
 
   // input handler
   const handleChange = (e) => {
@@ -32,46 +32,9 @@ export default function NotificationSettings() {
     });
   };
 
-  //poista tämä, kun kutsut toimivat backendille, ja ota käyttöön alempi kutsut backendille
 
-  // lisää tai päivitä 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    if (!form.name || !form.phone || !form.email) return;
-
-    if (isEditing) {
-      setContacts(prev => prev.map(c => (c.id === form.id ? form : c))
-      );
-    } else {
-      setContacts(prev => [
-        ...prev,
-        { ...form, id: Date.now().toString() }
-      ]);
-    }
-
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setForm({ id: null, name: "", phone: "", email: "" });
-    setIsEditing(false);
-  };
-
-  // poisto 
-  const handleDelete = (id) => {
-    setContacts(prev => prev.filter(c => c.id !== id));
-  };
-
-  // muokkaus 
-  const handleEdit = (contact) => {
-    setForm(contact);
-    setIsEditing(true);
-  };
-
-  //poisto tähän saakka
-
-  {/*kutsut backendille
+  //kutsut backendille
 
   // LISÄÄ tai PÄIVITÄ (POST / PUT)
   const handleSubmit = async (e) => {
@@ -121,6 +84,9 @@ export default function NotificationSettings() {
 
   // DELETE
   const handleDelete = async (id) => {
+    const confirmed = window.confirm("Haluatko varmasti poistaa yhteystiedon?");
+    if (!confirmed) return;
+    
     try {
       await fetch(`${API_URL}/${id}`, {
         method: "DELETE"
@@ -139,7 +105,7 @@ export default function NotificationSettings() {
     setIsEditing(true);
   };
 
-*/}
+
 
   return (
     <div className="container mt-4">

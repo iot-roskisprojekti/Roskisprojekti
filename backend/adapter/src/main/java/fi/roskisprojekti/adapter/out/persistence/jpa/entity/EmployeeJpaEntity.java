@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Table(name = "employee", schema = "roskis_db", uniqueConstraints = {@UniqueConstraint(name = "email",
         columnNames = {"email"})})
 public class EmployeeJpaEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id", nullable = false)
@@ -34,11 +36,11 @@ public class EmployeeJpaEntity {
     @Column(name = "phone", length = 50)
     private String phone;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "employeeJpaEntity")
     private Set<MessageJpaEntity> messageEntities = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "assignedEmployeeJpaEntity")
     private Set<TaskJpaEntity> taskEntities = new LinkedHashSet<>();
-
-
 }
