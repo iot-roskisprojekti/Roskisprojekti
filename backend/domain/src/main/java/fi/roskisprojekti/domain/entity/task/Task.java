@@ -5,6 +5,7 @@ import fi.roskisprojekti.domain.common.SingleTimeStamp;
 import fi.roskisprojekti.domain.common.StartTimeStamp;
 import fi.roskisprojekti.domain.entity.alert.AlertId;
 import fi.roskisprojekti.domain.entity.employee.EmployeeId;
+import fi.roskisprojekti.domain.entity.bin.BinId;
 import fi.roskisprojekti.domain.event.task.BinEmptyingTaskCompletedEvent;
 import fi.roskisprojekti.domain.event.task.TaskDomainEvent;
 import fi.roskisprojekti.domain.validation.DomainValidationException;
@@ -36,8 +37,8 @@ public class Task {
                 null
         );
     }
-    /**
-    public List<TaskDomainEvent> complete(EndTimeStamp end) {
+    
+    public List<TaskDomainEvent> complete(EndTimeStamp end, BinId binId) {
         if (createdAt.value().isAfter(end.value())) {
             throw new DomainValidationException("Task can't end before it started!");
         }
@@ -45,7 +46,7 @@ public class Task {
         this.completedAt = end;
         this.taskStatus = TaskStatus.COMPLETED;
 
-        return List.of(new BinEmptyingTaskCompletedEvent(this.taskId, this.alertId, end.value()));
+        return List.of(new BinEmptyingTaskCompletedEvent(this.taskId, binId, end.value()));
     }
-    */
+    
 }

@@ -9,6 +9,7 @@ import fi.roskisprojekti.domain.entity.bin.BinId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,6 +43,12 @@ public class BinPersistenceAdapter implements BinRepository {
 
     @Override
     public Bin save(Bin bin) {
-       return mapper.toDomainEntity(jpaRepository.save(mapper.toJpaEntity(bin)));
+        BinJpaEntity existing = jpaRepository.findById(bin.getBinId().value())
+                .orElseThrow(() -> new RuntimeException("Bin not found: " + bin.getBinId().value()));
+
+        existing.setFillLevelPercent(BigDecimal.valueOf(bin.getFillLevel().percent()));
+        existing.setLastMeasuredAt(bin.getLastUpdated() != null ? bin.getLastUpdated().value() : null);
+
+        return mapper.toDomainEntity(jpaRepository.save(existing));
     }
 }

@@ -20,7 +20,7 @@ public class DomainValidator {
             throw new DomainValidationException("Timestamp can't be null");
         }
 
-        if (value.isAfter(Instant.now())) {
+        if (value.isAfter(Instant.now().plusSeconds(5))) {
             throw new DomainValidationException("Timestamp can't be in the future");
         }
 

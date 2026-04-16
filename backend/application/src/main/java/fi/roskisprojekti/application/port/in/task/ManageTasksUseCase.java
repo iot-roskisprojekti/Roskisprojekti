@@ -7,4 +7,5 @@ import java.util.List;
 public interface ManageTasksUseCase {
     List<Task> findAll();
     void save(Task task);
+    void complete(Long taskId);
 }

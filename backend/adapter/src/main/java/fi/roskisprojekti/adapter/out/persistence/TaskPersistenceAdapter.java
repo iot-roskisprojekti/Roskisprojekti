@@ -7,9 +7,12 @@ import fi.roskisprojekti.adapter.out.persistence.jpa.repository.AlertJpaReposito
 import fi.roskisprojekti.adapter.out.persistence.jpa.repository.TaskJpaRepository;
 import fi.roskisprojekti.application.port.out.persistence.TaskRepository;
 import fi.roskisprojekti.domain.entity.task.Task;
+import fi.roskisprojekti.domain.entity.task.TaskId;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.List;
 
 @Component
@@ -32,5 +35,11 @@ public class TaskPersistenceAdapter implements TaskRepository {
                 .orElseThrow(() -> new RuntimeException("Alert not found for ID: " + task.getAlertId().value()));
 
         taskJpaRepository.save(taskPersistenceMapper.toJpaEntity(task, alertJpa));
+    }
+
+    @Override
+    public Optional<Task> findById(TaskId taskId) {
+        return taskJpaRepository.findById(taskId.value())
+                .map(taskPersistenceMapper::toDomainEntity);
     }
 }
