@@ -41,7 +41,7 @@ export default function App() {
   const formattedTime = currentTime.toLocaleTimeString("fi-FI");
 
   // =====================
-  // AUTO REFRESH
+  // AUTO REFRESH CONTAINERS
   // =====================
   useEffect(() => {
     refreshContainers();
@@ -52,50 +52,15 @@ export default function App() {
   }, []);
 
   // =====================
-  // AUTO TASKS
+  // AUTO REFRESH TASKS
   // =====================
   useEffect(() => {
-    setTasks(prev => {
-      const updated = [...prev];
-      containers.forEach(c => {
-        if (c.fillLevel >= 70) {
-          const exists = updated.some(t => t.containerId === c.id);
-          if (!exists) {
-            updated.push({
-              id: "auto-" + c.id,
-              containerId: c.id,
-              containerName: c.name,
-              alertLevel: c.fillLevel,
-              priority: c.fillLevel >= 85 ? "Kriittinen" : "Varoitus",
-              assignedTo: "Ei osoitettu",
-              createdAt: new Date().toISOString()
-            });
-          }
-        }
-      });
-      return updated;
-    });
-  }, [containers]);
-
-  const handleCompleteTask = (taskId, containerId) => {
-    setContainers(prev =>
-      prev.map(c =>
-        c.id === String(containerId)
-          ? { ...c, fillLevel: 0 }
-          : c
-      )
-    );
-    setTasks(prev => {
-      const task = prev.find(t => t.id === taskId);
-      if (task) {
-        setCompletedTasks(old => {
-          if (old.some(t => t.id === taskId)) return old;
-          return [...old, { ...task, completedAt: new Date().toISOString() }];
-        });
-      }
-      return prev.filter(t => t.id !== taskId);
-    });
-  };
+    refreshTasks();
+    const interval = setInterval(() => {
+      refreshTasks();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // =====================
   // SAFE DATE HELPERS
@@ -109,14 +74,9 @@ export default function App() {
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return "Ei tietoa";
-
     const cleaned = String(timestamp).trim();
     const d = new Date(cleaned);
-
-    console.log("formatTimestamp input:", timestamp, "-> Date:", d, "valid:", !isNaN(d.getTime()));
-
     if (isNaN(d.getTime())) return "Ei tietoa";
-
     return d.toLocaleString("fi-FI", {
       day: "2-digit",
       month: "2-digit",
@@ -128,7 +88,7 @@ export default function App() {
   };
 
   // =====================
-  // FETCH DATA
+  // FETCH CONTAINERS
   // =====================
   const refreshContainers = async () => {
     setLoading(true);
@@ -163,7 +123,6 @@ export default function App() {
         };
       });
 
-      // Lisää sitet joilla ei ole biniä
       const siteIdsWithBins = new Set(bins.map(b => String(b.siteId)));
       const fromSitesOnly = sites
         .filter(s => !siteIdsWithBins.has(String(s.id)))
@@ -178,6 +137,7 @@ export default function App() {
           isStale: true,
           isOnline: false
         }));
+
       setContainers([...fromBins, ...fromSitesOnly]);
       setSystemStatus("online");
 
@@ -187,6 +147,47 @@ export default function App() {
       setSystemStatus("offline");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // =====================
+  // FETCH TASKS
+  // =====================
+  const refreshTasks = async () => {
+    try {
+      const [tasksRes, alertsRes, binsRes, sitesRes] = await Promise.all([
+        fetch("http://localhost:8080/api/tasks"),
+        fetch("http://localhost:8080/api/alerts"),
+        fetch("http://localhost:8080/api/bins"),
+        fetch("http://localhost:8080/api/sites"),
+      ]);
+
+      if (!tasksRes.ok) throw new Error("Tasks fetch failed");
+      if (!alertsRes.ok) throw new Error("Alerts fetch failed");
+      if (!binsRes.ok) throw new Error("Bins fetch failed");
+      if (!sitesRes.ok) throw new Error("Sites fetch failed");
+
+      const tasksData = await tasksRes.json();
+      const alertsData = await alertsRes.json();
+      const binsData = await binsRes.json();
+      const sitesData = await sitesRes.json();
+
+      const enriched = tasksData.map(task => {
+        const alert = alertsData.find(a => a.id === task.alertId) ?? null;
+        const bin = alert ? binsData.find(b => Number(b.binId) === Number(alert.binId)) ?? null : null;
+        const site = bin ? sitesData.find(s => Number(s.id) === Number(bin.siteId)) ?? null : null;
+
+        return {
+          ...task,
+          alert,
+          binName: site?.name ?? bin?.name ?? `Astia #${alert?.binId ?? "?"}`,
+          fillLevel: bin?.fillLevel ?? null,
+        };
+      });
+
+      setTasks(enriched);
+    } catch (err) {
+      console.error("Virhe tehtävien haussa:", err);
     }
   };
 
@@ -251,7 +252,7 @@ export default function App() {
               <Containers containers={containers} setContainers={setContainers} />
             } />
             <Route path="/tehtavat" element={
-              <Tasks tasks={tasks} onCompleteTask={handleCompleteTask} />
+              <Tasks tasks={tasks} setTasks={setTasks} />
             } />
             <Route path="/raportit" element={
               <Reports containers={containers} completedTasks={completedTasks} />
