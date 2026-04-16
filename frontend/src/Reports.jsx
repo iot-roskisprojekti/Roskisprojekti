@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-
-
-/* Tietokanta mahdollistaa esimerkiksi seuraavien asioiden raportoimisen käyttöliittymässä: 
-• Säiliöiden keskimääräinen täyttöaste 
-• Hälytysten määrä 
-• Säiliökohtaisen historiallinen data 
-• Työtehtävien käsittelyaika */
-
-
-
 export default function Reports({ containers = [], completedTasks = [] }) {
 
   const [selectedContainer, setSelectedContainer] = useState(
     containers.length > 0 ? containers[0] : null
   );
-
   const [containerHistory, setContainerHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,10 +16,6 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     }
   }, [containers]);
 
-  if (!containers || containers.length === 0) return <p>Ei säiliödataa</p>;
-  if (!selectedContainer) return <p>Ladataan...</p>;
-
-  // Hae historia backendistä
   useEffect(() => {
     if (!selectedContainer) return;
 
@@ -40,24 +25,18 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     const fetchHistory = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const response = await fetch(
           `http://localhost:8080/api/bins/${selectedContainer.id}/history`,
           { signal: controller.signal }
         );
-
         if (!response.ok) throw new Error("Palvelinvirhe");
-
         const data = await response.json();
-
         setContainerHistory(data.history || []);
-
       } catch (err) {
         console.error("Backend-virhe:", err);
         setError("Datan haku epäonnistui");
         setContainerHistory([]);
-        setEmptyHistory([]);
       } finally {
         clearTimeout(timeoutId);
         setLoading(false);
@@ -65,8 +44,11 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     };
 
     fetchHistory();
-
+    return () => controller.abort();
   }, [selectedContainer]);
+
+  if (!containers || containers.length === 0) return <p>Ei säiliödataa</p>;
+  if (!selectedContainer) return <p>Ladataan...</p>;
 
   // Tilastot
   const fillLevels = containerHistory.map(h => h.fillLevel);
@@ -88,7 +70,6 @@ export default function Reports({ containers = [], completedTasks = [] }) {
     const tasksWithTime = filteredCompletedTasks.filter(
       t => t.createdAt && t.completedAt
     );
-
     if (tasksWithTime.length === 0) return null;
 
     const totalMs = tasksWithTime.reduce((sum, task) => {
@@ -116,7 +97,7 @@ export default function Reports({ containers = [], completedTasks = [] }) {
 
       {/* Säiliön valinta */}
       <div className="w-full max-w-md p-4 bg-white rounded shadow text-center">
-        <label className="font-medium mr-2">Valitse säiliö:</label>
+        <label className="font-medium mr-4">Valitse säiliö:</label>
         <select
           value={selectedContainer?.id || ""}
           onChange={(e) => {
