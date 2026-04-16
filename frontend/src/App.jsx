@@ -43,13 +43,18 @@ export default function App() {
   // =====================
   // AUTO REFRESH CONTAINERS
   // =====================
+
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     refreshContainers();
     const interval = setInterval(() => {
-      refreshContainers();
+      if (!isEditing) {  // älä refreshaa muokkauksen aikana
+        refreshContainers();
+      }
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isEditing]);
 
   // =====================
   // AUTO REFRESH TASKS
@@ -249,7 +254,7 @@ export default function App() {
               />
             } />
             <Route path="/sailiot" element={
-              <Containers containers={containers} setContainers={setContainers} />
+              <Containers containers={containers} setContainers={setContainers} setIsEditing={setIsEditing}/>
             } />
             <Route path="/tehtavat" element={
               <Tasks tasks={tasks} setTasks={setTasks} />
