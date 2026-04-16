@@ -27,6 +27,7 @@ export default function Tasks({ tasks, onCompleteTask }) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              gap: "10px",
             }}
           >
             <span>
@@ -43,15 +44,18 @@ export default function Tasks({ tasks, onCompleteTask }) {
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
-                padding: "5px 10px",
+                padding: "8px 12px",
                 cursor: "pointer",
+                minWidth: "160px",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
               onClick={() => {
                 // Paikallinen simulaatio
                 onCompleteTask && onCompleteTask(task.id, task.containerId);
               }}
             >
-              Kuittaa
+              Kuittaa tyhjennetyksi
             </button>
 
             {/* -------------------------------
