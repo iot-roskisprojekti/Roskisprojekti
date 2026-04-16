@@ -92,8 +92,9 @@ export default function Dashboard({
       >
         {sortedContainers.map(bin => {
           const hasTask = tasks?.some(
-            task => task.containerId === bin.id
-          );
+          task => Number(task.alert?.binId) === Number(bin.id)
+        );
+          
 
           const isCritical = !bin.isOnline ? false : bin.fillLevel >= 85;
           const isWarning = !bin.isOnline ? false : bin.fillLevel >= 70 && bin.fillLevel < 85;
