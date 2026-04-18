@@ -33,37 +33,53 @@ export default function Containers({ containers, setContainers, setIsEditing }) 
   };
 
   const saveChanges = async () => {
-    console.log("URL:", `http://localhost:8080/api/sites/${editingId}`);
+    console.log("editedData:", editedData);
+    console.log("editedData.binId:", editedData.binId);
     console.log("editingId:", editingId);
-    try {
-      const response = await fetch(`http://localhost:8080/api/sites/${editingId}`, {
+  try {
+    // PUT site (nimi ja sijainti)
+    const siteResponse = await fetch(`http://localhost:8080/api/sites/${editingId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: Number(editingId),
+        name: editedData.name,
+        location: editedData.location,
+      }),
+    });
+    if (!siteResponse.ok) throw new Error("Site muokkaus epäonnistui");
+
+    // PUT bin (kapasiteetti) - vain jos binId löytyy
+    if (editedData.binId) {
+      console.log("Lähetetään bin PUT:", `http://localhost:8080/api/bins/${editedData.binId}`);
+      const binResponse = await fetch(`http://localhost:8080/api/bins/${editedData.binId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: Number(editingId),
+          binId: editedData.binId,
+          siteId: Number(editingId),
           name: editedData.name,
-          location: editedData.location,
+          capacityLiters: editedData.capacity,
+          fillLevel: editedData.fillLevel,
         }),
       });
-
-      console.log("Response status:", response.status);
-      if (!response.ok) throw new Error("Muokkaus epäonnistui");
-
-      const updated = await response.json();
-
-      setContainers(containers.map(c =>
-        c.id === editingId
-          ? { ...c, name: updated.name, location: updated.location, capacity: editedData.capacity }
-          : c
-      ));
-    } catch (error) {
-      console.error("Muokkaus epäonnistui:", error);
-      alert("Muokkaus epäonnistui. Tarkista backend.");
-    } finally {
-      setEditingId(null);
-      setIsEditing(false);
+      console.log("Bin response status:", binResponse.status);
+      if (!binResponse.ok) throw new Error("Bin muokkaus epäonnistui");
     }
-  };
+
+    setContainers(containers.map(c =>
+      c.id === editingId
+        ? { ...c, name: editedData.name, location: editedData.location, capacity: editedData.capacity }
+        : c
+    ));
+  } catch (error) {
+    console.error("Muokkaus epäonnistui:", error);
+    alert("Muokkaus epäonnistui. Tarkista backend.");
+  } finally {
+    setEditingId(null);
+    setIsEditing(false);
+  }
+};
 
   const deleteContainer = async (id) => {
     if (!window.confirm("Haluatko varmasti poistaa säiliön?")) return;

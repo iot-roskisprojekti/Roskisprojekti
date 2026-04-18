@@ -117,6 +117,7 @@ export default function App() {
 
         return {
           id: String(bin.siteId),
+          binId: bin.binId,
           name: site?.name ?? bin.name ?? `Bin ${bin.binId}`,
           location: site?.location ?? "Ei tietoa",
           capacity: bin.capacityLiters ?? "",

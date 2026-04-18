@@ -4,6 +4,7 @@ import fi.roskisprojekti.adapter.in.rest.dto.BinRestDto;
 import fi.roskisprojekti.domain.common.SingleTimeStamp;
 import fi.roskisprojekti.domain.entity.bin.*;
 import fi.roskisprojekti.domain.entity.site.SiteId;
+import fi.roskisprojekti.domain.entity.bin.Capacity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -27,6 +28,7 @@ public interface BinRestMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "fillLevel", source = "fillLevel")
     @Mapping(target = "lastUpdated", source = "lastUpdated")
+    @Mapping(target = "capacity", source = "capacityLiters")
     Bin toDomainEntity(BinRestDto dto);
 
     default BinId mapBinId(Long value) {
@@ -48,4 +50,8 @@ public interface BinRestMapper {
     default SingleTimeStamp mapLastUpdated(Instant value) {
         return value != null ? new SingleTimeStamp(value) : null;
     }
+
+    default Capacity mapCapacity(Double value) {
+    return value != null ? new Capacity(value) : new Capacity(0.0);
+}
 }
