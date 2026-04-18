@@ -31,10 +31,10 @@ public class BinTelemetryService implements HandleInBoundTelemetryUseCase {
     @Transactional
     public void handleBinTelemetry(BinTelemetry telemetry) {
         telemetryRepository.save(telemetry);
-        /**
+        
         BinTelemetryReceivedEvent event = new BinTelemetryReceivedEvent(telemetry);
         domainEventPublisher.publishBinTelemetryDomainEvent(event);
-         */
+         
 
         Bin bin = binRepository.findById(telemetry.getBinId())
                 .orElseThrow(() -> new RuntimeException("Bin not found"));

@@ -12,6 +12,9 @@ services:
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/app/config/
       - SPRING_PROFILES_ACTIVE=docker
+
+      - SPRING_MAIL_USERNAME=${MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
@@ -29,6 +32,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASS}
       - MYSQL_DATABASE=${DB_NAME}
+      
     volumes:
       - roskis_mysql_data:/var/lib/mysql
     healthcheck:

@@ -15,11 +15,11 @@ INSERT INTO site (name, location) VALUES
 
 -- 3. Bins (Säiliöt) - One bin per pilot site
 INSERT INTO bin (site_id, name, capacity_liters) VALUES
-                                                     (1, 'BIN-001', 600.00),
-                                                     (2, 'BIN-002', 600.00),
-                                                     (3, 'BIN-003', 240.00),
-                                                     (4, 'BIN-004', 240.00),
-                                                     (5, 'BIN-005', 1000.00);
+                                                    (1, 'Kuopion Tori', 600.00),
+                                                    (2, 'Matkus Shopping Center', 600.00),
+                                                    (3, 'Puijo Tower', 240.00),
+                                                    (4, 'University of Eastern Finland', 240.00),
+                                                    (5, 'Kuopio Railway Station', 1000.00);
 
 -- 4. Measurement Data (Mittausdata) - Historical samples
 INSERT INTO measurement (bin_id, distance_mm, measured_at) VALUES
