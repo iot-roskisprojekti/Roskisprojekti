@@ -1,21 +1,18 @@
 package fi.roskisprojekti.domain.entity.bin;
 
-
 import fi.roskisprojekti.domain.common.SingleTimeStamp;
 import fi.roskisprojekti.domain.entity.site.SiteId;
 import fi.roskisprojekti.domain.entity.telemetry.bin.BinTelemetry;
 import fi.roskisprojekti.domain.event.bin.BinDomainEvent;
 import fi.roskisprojekti.domain.event.bin.BinEmptyingRequiredEvent;
-import fi.roskisprojekti.domain.event.bin.BinStaleEvent;
+import fi.roskisprojekti.domain.entity.telemetry.bin.Distance;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import fi.roskisprojekti.domain.entity.telemetry.bin.Distance;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Getter
 @AllArgsConstructor
@@ -32,14 +29,29 @@ public class Bin {
     private SingleTimeStamp lastUpdated;
     private BinStatus binStatus;
 
-    //rosentteina 0-100 -- tämä riittänee tässä vaiheessa
-    public void updateFillLevel(FillLevel percent){
+    public void updateFillLevel(FillLevel percent) {
         this.fillLevel = percent;
     }
 
+    public List<BinDomainEvent> updateFromTelemetry(BinTelemetry latestTelemetry) {
+        List<BinDomainEvent> events = new ArrayList<>();
+        BinStatus oldStatus = this.binStatus;
 
+        // KORJAUS TÄSSÄ: Lisätty get-etuliitteet
+        this.fillLevel = updateFillLevelFromCensor(latestTelemetry.getDistance());
+        this.lastUpdated = latestTelemetry.getMeasuredAt();
 
-    private BinStatus updateStatus() {
+        this.binStatus = calculateStatus();
+
+        if (this.binStatus == BinStatus.NEEDS_EMPTYING && oldStatus != BinStatus.NEEDS_EMPTYING) {
+            events.add(new BinEmptyingRequiredEvent(this.binId, Instant.now()));
+            System.out.println("DOMAIN: Kriittinen raja ylittyi! Roskis " + binId.value() + " vaatii tyhjennystä.");
+        }
+
+        return events;
+    }
+
+    private BinStatus calculateStatus() {
         if (staleThresholdReached()) {
             return BinStatus.STALE_TELEMETRY;
         }
@@ -53,57 +65,19 @@ public class Bin {
         }
 
         return BinStatus.OK;
-
-
-
     }
 
-
-    public void updateFromTelemetry(BinTelemetry latestTelemetry) {
-        this.fillLevel = updateFillLevelFromCensor(latestTelemetry.getDistance());
-        this.lastUpdated = latestTelemetry.getMeasuredAt();
-
-        this.binStatus = updateStatus();
-    }
-
-    /**
-    public List<BinDomainEvent> updateFromTelemetry(BinTelemetry latestTelemetry){
-        List<BinDomainEvent> domainEvents = new ArrayList<>();
-
-        BinStatus prevStatus = this.binStatus;
-        this.fillLevel = updateFillLevelFromCensor(latestTelemetry.getDistance());
-        this.lastUpdated = latestTelemetry.getMeasuredAt();
-
-        this.binStatus = this.updateStatus(SingleTimeStamp.now().value());
-
-        if(this.binStatus == BinStatus.STALE_TELEMETRY){
-            domainEvents.add(new BinStaleEvent(this.getBinId(), this.lastUpdated.value()));
+    private FillLevel updateFillLevelFromCensor(Distance distance) {
+        if (dimensions == null || dimensions.height() <= 0) {
+            return new FillLevel(0);
         }
-
-        if(this.binStatus == BinStatus.CRITICAL && prevStatus != BinStatus.CRITICAL) {
-            domainEvents.add(new BinEmptyingRequiredEvent(this.getBinId(), SingleTimeStamp.now().value()));
-        }
-
-        return domainEvents;
-
-    }
-    */
-    //toistaiseksi turha? jos muodoltaan symmetrinen riittää korkeus
-    //DB ei sisällä mittoja 
-    //Laskenta kapasiteetilla vai korkeudella? Tarvitaanko kapasiteettia? 
-    private FillLevel updateFillLevelFromCensor(Distance distance){
         double percent = (dimensions.height() - distance.value()) / dimensions.height() * 100;
+        percent = Math.max(0, Math.min(100, percent));
         return new FillLevel(percent);
-
     }
 
-
-
-    public boolean staleThresholdReached(){
+    public boolean staleThresholdReached() {
         if (lastUpdated == null || lastUpdated.value() == null) return false;
         return Duration.between(lastUpdated.value(), Instant.now()).toMinutes() > staleThresholdMinutes.value();
     }
-
-
-
 }
