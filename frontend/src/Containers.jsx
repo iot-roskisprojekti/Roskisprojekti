@@ -204,7 +204,6 @@ export default function Containers({ containers, setContainers, setIsEditing }) 
       <table className="table table-striped">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nimi</th>
             <th>Sijainti</th>
             <th>Täyttöaste</th>
@@ -217,7 +216,6 @@ export default function Containers({ containers, setContainers, setIsEditing }) 
         <tbody>
           {containers.map((c) => (
             <tr key={c.id}>
-              <td>{c.id}</td>
               <td>
                 {editingId === c.id
                   ? <input name="name" value={editedData.name} onChange={handleChange} className="form-control" />
