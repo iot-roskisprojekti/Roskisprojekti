@@ -104,39 +104,63 @@ export default function Containers({ containers, setContainers, setIsEditing }) 
   };
 
   const addContainer = async () => {
-    if (!newContainer.location) {
-      alert("Sijainti on pakollinen");
-      return;
-    }
-    try {
-      const response = await fetch("http://localhost:8080/api/sites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: newContainer.name,
-          location: newContainer.location,
-        }),
-      });
-      if (!response.ok) throw new Error("Lisäys epäonnistui");
-      const saved = await response.json();
-      setContainers([...containers, {
-        ...newContainer,
-        id: String(saved.id),
-      }]);
-      setNewContainer({
-        name: "",
-        location: "",
+    console.log("addContainer käynnistyy");
+    console.log("newContainer:", newContainer);
+  if (!newContainer.location) {
+    alert("Sijainti on pakollinen");
+    return;
+  }
+  try {
+    // 1. Luo site
+    const siteResponse = await fetch("http://localhost:8080/api/sites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newContainer.name,
+        location: newContainer.location,
+      }),
+    });
+    if (!siteResponse.ok) throw new Error("Site lisäys epäonnistui");
+    const savedSite = await siteResponse.json();
+    console.log("Site luotu, id:", savedSite.id);
+
+    // 2. Luo bin sitelle
+    const binResponse = await fetch("http://localhost:8080/api/bins", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        siteId: savedSite.id,
+        name: newContainer.name,
+        capacityLiters: newContainer.capacity,
         fillLevel: 0,
-        capacity: "",
-        status: "normal",
-        isOnline: true,
-        lastUpdate: new Date().toLocaleTimeString(),
-      });
-    } catch (error) {
-      console.error("Lisäys epäonnistui:", error);
-      alert("Lisäys epäonnistui. Tarkista backend.");
-    }
-  };
+      }),
+    });
+    if (!binResponse.ok) throw new Error("Bin lisäys epäonnistui");
+    const savedBin = await binResponse.json();
+    console.log("Bin luotu, capacityLiters:", savedBin.capacityLiters);
+
+    setContainers([...containers, {
+      ...newContainer,
+      id: String(savedSite.id),
+      binId: savedBin.binId,
+      capacity: savedBin.capacityLiters,
+      isOnline: true,
+    }]);
+
+    setNewContainer({
+      name: "",
+      location: "",
+      fillLevel: 0,
+      capacity: "",
+      status: "normal",
+      isOnline: true,
+      lastUpdate: new Date().toLocaleTimeString(),
+    });
+  } catch (error) {
+    console.error("Lisäys epäonnistui:", error);
+    alert("Lisäys epäonnistui. Tarkista backend.");
+  }
+};
 
   const translateStatus = (status) => {
     switch (status) {

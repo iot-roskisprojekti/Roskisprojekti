@@ -48,12 +48,15 @@ public Bin save(Bin bin) {
     System.out.println("Saving bin, binId: " + bin.getBinId());
     System.out.println("Saving bin, siteId: " + bin.getSiteId());
     System.out.println("Saving bin, capacity: " + bin.getCapacity());
+    System.out.println("binId value: " + (bin.getBinId() != null ? bin.getBinId().value() : "NULL"));
 
-    // Uusi bin (binId null) tai olemassa oleva
     BinJpaEntity entity;
     if (bin.getBinId() == null || bin.getBinId().value() == null) {
         // Luo uusi
         entity = mapper.toJpaEntity(bin);
+        if (entity.getHeightMm() == null) {
+            entity.setHeightMm(1000);
+        }
     } else {
         // Päivitä olemassa oleva
         entity = jpaRepository.findById(bin.getBinId().value())
