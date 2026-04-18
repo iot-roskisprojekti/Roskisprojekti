@@ -49,8 +49,8 @@ public class TaskJpaEntity {
     @Column(name = "done_at")
     private Instant doneAt;
 
-    @OneToMany(mappedBy = "taskJpaEntity")
-    private Set<MessageJpaEntity> messageEntities = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "taskJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+private Set<MessageJpaEntity> messageEntities = new LinkedHashSet<>();
 
 
 }

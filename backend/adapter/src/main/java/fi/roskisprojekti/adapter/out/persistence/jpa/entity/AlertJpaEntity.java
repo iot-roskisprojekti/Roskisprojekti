@@ -53,8 +53,8 @@ public class AlertJpaEntity {
     @Column(name = "closed_at")
     private Instant closedAt;
 
-    @OneToOne(mappedBy = "alertJpaEntity")
-    private TaskJpaEntity taskJpaEntity;
+    @OneToOne(mappedBy = "alertJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+private TaskJpaEntity taskJpaEntity;
 
 
 }

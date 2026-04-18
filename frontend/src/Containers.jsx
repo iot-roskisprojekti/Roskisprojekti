@@ -82,18 +82,31 @@ export default function Containers({ containers, setContainers, setIsEditing }) 
 };
 
   const deleteContainer = async (id) => {
-    if (!window.confirm("Haluatko varmasti poistaa säiliön?")) return;
-    try {
-      const response = await fetch(`http://localhost:8080/api/sites/${id}`, {
+  if (!window.confirm("Haluatko varmasti poistaa säiliön?")) return;
+  try {
+    // 1. Etsi binId tästä containerista
+    const container = containers.find(c => c.id === id);
+    
+    // 2. Poista bin ensin jos löytyy
+    if (container?.binId) {
+      const binResponse = await fetch(`http://localhost:8080/api/bins/${container.binId}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Poisto epäonnistui");
-      setContainers(containers.filter(c => c.id !== id));
-    } catch (error) {
-      console.error("Poisto epäonnistui:", error);
-      alert("Poisto epäonnistui. Tarkista backend.");
+      if (!binResponse.ok) throw new Error("Bin poisto epäonnistui");
     }
-  };
+
+    // 3. Poista site
+    const siteResponse = await fetch(`http://localhost:8080/api/sites/${id}`, {
+      method: "DELETE",
+    });
+    if (!siteResponse.ok) throw new Error("Site poisto epäonnistui");
+
+    setContainers(containers.filter(c => c.id !== id));
+  } catch (error) {
+    console.error("Poisto epäonnistui:", error);
+    alert("Poisto epäonnistui. Tarkista backend.");
+  }
+};
 
   const handleNewChange = (e) => {
     const { name, value, type } = e.target;

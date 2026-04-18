@@ -37,11 +37,11 @@ public class BinJpaEntity {
     @Column(name = "capacity_liters", nullable = false, precision = 10, scale = 2)
     private BigDecimal capacityLiters;
 
-    @OneToMany(mappedBy = "binJpaEntity")
+    @OneToMany(mappedBy = "binJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AlertJpaEntity> alertEntities = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "binJpaEntity")
-    private Set<MeasurementJpaEntity> measurementEntities = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "binJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+private Set<MeasurementJpaEntity> measurementEntities = new LinkedHashSet<>();
     @NotNull
     @ColumnDefault("1000")
     @Column(name = "height_mm", nullable = false)
