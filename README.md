@@ -147,11 +147,14 @@ Etsi sieltä username ja password ja kopioi ne.
 Lisää kopioimasi tiedot projektin asetuksiin. Jotta homma toimii oikein kehitysvaiheessa, päivitä nämä molempiin tiedostoihin:
 
 Tiedosto 1: backend/infrastructure/src/main/resources/application.properties
-
 Properties
+
 spring.mail.host=sandbox.smtp.mailtrap.io
+
 spring.mail.port=2525
+
 spring.mail.username=SINUN_USERNAM_TÄHÄN
+
 spring.mail.password=SINUN_SALASANA_TÄHÄN
 ------------------------------------------------------------------------------------
 Tiedosto 2: backend/infrastructure/src/main/resources/application-dev.properties
@@ -160,13 +163,18 @@ Asetukset:
 
 # Sähköpostipalvelimen osoite (Mailtrap sandbox)
 spring.mail.host=sandbox.smtp.mailtrap.io
+
 spring.mail.port=2525
+
 
 # Mailtrapista haetut henkilökohtaiset tunnukset
 spring.mail.username=Kopioi_tähän_tunnus_mailtrapista
+
 spring.mail.password=Kopioi_tähän_salasana_mailtrapista
 
 # Lisäasetukset, jotta yhteys toimii suojatusti
+
 spring.mail.properties.mail.smtp.auth=true
+
 spring.mail.properties.mail.smtp.starttls.enable=true
 ------------------------------------------------------------------
