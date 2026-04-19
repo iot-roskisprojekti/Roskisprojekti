@@ -69,7 +69,7 @@ public interface BinPersistenceMapper {
     }
 
     default FillAlertThreshold mapAlertThreshold(BinJpaEntity entity) {
-        return new FillAlertThreshold(70, 90);
+        return new FillAlertThreshold(70, 85);
     }
     default SingleTimeStamp mapLastUpdated(Instant time) {
         return new SingleTimeStamp(time != null ? time : Instant.EPOCH);
