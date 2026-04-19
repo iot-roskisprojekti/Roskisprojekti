@@ -141,7 +141,9 @@ Mene kohtaan Inboxes -> My Inbox.
 Valitse SMTP Settings -välilehdeltä integraatioksi Spring Boot.
 
 2. Tunnusten lisäys koodiin
+
 Etsi sieltä username ja password ja kopioi ne.
+
 --------------------------------------------------------------------------------------------------------------
 3. Profiilien päivitys (application.properties)
 Lisää kopioimasi tiedot projektin asetuksiin. Jotta homma toimii oikein kehitysvaiheessa, päivitä nämä molempiin tiedostoihin:
@@ -156,7 +158,9 @@ spring.mail.port=2525
 spring.mail.username=SINUN_USERNAM_TÄHÄN
 
 spring.mail.password=SINUN_SALASANA_TÄHÄN
+
 ------------------------------------------------------------------------------------
+
 Tiedosto 2: backend/infrastructure/src/main/resources/application-dev.properties
 
 Asetukset:
@@ -168,6 +172,7 @@ spring.mail.port=2525
 
 
 # Mailtrapista haetut henkilökohtaiset tunnukset
+
 spring.mail.username=Kopioi_tähän_tunnus_mailtrapista
 
 spring.mail.password=Kopioi_tähän_salasana_mailtrapista
@@ -177,4 +182,5 @@ spring.mail.password=Kopioi_tähän_salasana_mailtrapista
 spring.mail.properties.mail.smtp.auth=true
 
 spring.mail.properties.mail.smtp.starttls.enable=true
+
 ------------------------------------------------------------------
