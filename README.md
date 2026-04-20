@@ -1,7 +1,14 @@
-# Roskisprojekti 
-Ohjelmistotuotanto 2 ryhmäprojekti
+# Roskisprojekti
+
+Ohjelmistotuotanto 2 kurssin ryhmäprojekti 2026
+Itä-Suomen yliopisto
+
+**Tekijät:** Laura Kokko, Mika Ruuhilahti, Aatu Saali, Anttoni Smahl, Nina Takkunen, Jasmin Tikkanen
+
+---
 
 ## Lisenssi
+
 MIT License
 
 Copyright (c) [2026] [Laura Kokko, Mika Ruuhilahti, Aatu Saali, Anttoni Smahl, Nina Takkunen, Jasmin Tikkanen]
@@ -24,163 +31,176 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## Frontend
-Reactilla (Vite) toteutettu frontend roskasäiliön IoT-seurantaprojektiin.  
-Tässä vaiheessa repositorio sisältää vain käyttöliittymän lähdekoodin.
+---
 
-### Teknologiat
+## Teknologiat
 
-- React
-- Vite
-- JavaScript (JSX)
-- CSS
-- npm
+**Frontend:** React, Vite, JavaScript (JSX), CSS, npm  
+**Backend:** Spring Boot (Java), Docker, MySQL, MQTT
 
-### Vaatimukset
+---
+
+## Vaatimukset
 
 Varmista, että seuraavat ovat asennettuna:
 
-- Node.js (suositus v18 tai uudempi)
+- Node.js (v18 tai uudempi)
 - npm
 - Git
-- Visual Studio Code
+- Docker tai Docker Desktop
+- Vapaavalintainen IDE (esim. Visual Studio Code tai IntelliJ)
 
-### Projektin kloonaus
+---
 
-Kloonaa repositorio omalle koneellesi:
+## Projektin käynnistys
 
-`git clone https://github.com/USERNAME/REPOSITORY_NAME.git`
+### Vaihe 1 – Kloonaa repositorio ja aseta ympäristömuuttujat
 
-`cd REPOSITORY_NAME`
+Avaa terminaali ja kloonaa `testailu`-branchi:
 
-### Asenna projektin riippuvuudet:
+```bash
+git clone -b testailu https://github.com/iot-roskisprojekti/Roskisprojekti.git
+cd Roskisprojekti
+```
 
-`npm install`
+Nimeä `.env.pohja` tiedosto `.env`:ksi **ennen** kuin avaat projektin Dev Containerina VS Codessa:
 
-### Käynnistä Vite kehityspalvelin:
+```bash
+# Linuxilla / macOS:
+mv .env.pohja .env
 
-`npm run dev`
+# Windowsilla:
+rename .env.pohja .env
+```
 
-Käyttöliittymä avautuu selaimeen osoitteeseen, jonka Vite tulostaa terminaaliin, yleensä:
-`http://localhost:xxxx`
+Avaa `.env` ja aseta vapaavalintainen tietokantasalasana:
 
-TIETOKANTAYHTEYS OHJEET:
+```
+DB_PASS=päähänsattuu
+```
 
-INTELLJ:
-Avaa View → Tool Windows → Database.
+---
 
-Klikkaa + → Data Source → MySQL.
+### Vaihe 2 – Käynnistä backend, tietokanta ja MQTT Dockerilla
 
-Syötä:
+Navigoi juurikansioon ja aja:
 
-Host: localhost
+```bash
+docker compose up --build -d
+```
 
-Port: 3306
+Tämä käynnistää kolme erillistä containeria: backend, MySQL ja MQTT-palvelin.
 
-User: root
+**Portit:**
 
-Password: oma MySQL-salasana
+| Palvelu   | Host-portti | Container-portti |
+|-----------|-------------|------------------|
+| Backend   | 8080        | 8080             |
+| MySQL     | 3307        | 3306             |
+| MQTT      | 1884        | 1883             |
 
-Database: tietokannan nimi
+Backendin API löytyy osoitteesta: `http://localhost:8080/api/sites`
 
-Klikkaa Test Connection → jos onnistuu, paina OK.
+> **Huom:** Aja `docker compose up --build -d` aina, kun backend-koodi tai `pom.xml` muuttuu.  
+> Muuten riittää: `docker compose up -d`
 
-Visual Studio Code
-Yhdistä MySQL VS Code -laajennuksella (Helpoin)
-Asenna MySQL (jos ei vielä ole)
+---
 
-Lataa ja asenna:
+### Vaihe 3 – Frontend (kehityspalvelin)
 
-👉 MySQL Community Server
+Asenna riippuvuudet ja käynnistä Vite-kehityspalvelin:
 
-Asennuksen aikana:
+```bash
+npm install
+npm run dev
+```
 
-Muista root-salasana
+Käyttöliittymä avautuu selaimeen osoitteeseen, jonka Vite tulostaa terminaaliin – yleensä `http://localhost:5173`.
 
-Oletusportti on yleensä 3306
+---
 
-2. Asenna MySQL-laajennus VS Codeen
+## Dev Container -kehitysympäristö (valinnainen)
 
-Avaa VS Code
+Jos haluat kehittää backendiä tai tietokantaa VS Codessa Dev Containerina:
 
-Mene Extensions (Ctrl + Shift + X)
+1. Asenna **Dev Containers** -laajennus VS Code Marketplacesta.
+2. Avaa kloonattu kansio VS Codessa.
+3. VS Code kysyy oikeassa alareunassa: "Reopen in Container" – valitse se.  
+   Jos pop-up ei näy, paina `F1` ja kirjoita `Dev Containers: Reopen in Container`.
+4. Ensimmäisellä kerralla VS Code buildaa ympäristön – odota rauhassa.
+5. Kun ympäristö on käynnissä, valitse `Run → Run without Debugging` käynnistääksesi backendin.  
+   VS Coden alareunan toolbaarista voi käynnistää myös frontendin tai kaiken kerralla.
 
-Hae:
+---
 
-👉 MySQL (tekijä esim. cweijan)
+## Tietokantayhteys
 
-Paina Install
+### IntelliJ IDEA
 
-3.Luo yhteys MySQL-palvelimeen
+1. Avaa `View → Tool Windows → Database`
+2. Klikkaa `+` → `Data Source` → `MySQL`
+3. Syötä tiedot:
 
-Paina vasemman reunan MySQL-ikonia
+   | Kenttä   | Arvo                  |
+   |----------|-----------------------|
+   | Host     | localhost             |
+   | Port     | 3307 *(Dockerin host-portti)* |
+   | User     | root                  |
+   | Password | `.env`-tiedostoon asettamasi salasana |
+   | Database | tietokannan nimi      |
 
-Valitse Add Connection
+4. Klikkaa `Test Connection` – jos onnistuu, paina `OK`.
 
-Täytä tiedot:
+### Visual Studio Code
 
-Kenttä	Arvo
-Host	localhost
-User	root
-Password	(se jonka asetit)
-Port	3306
+1. Asenna **MySQL**-laajennus (esim. tekijä: cweijan): `Ctrl + Shift + X` → hae "MySQL" → Install.
+2. Paina vasemman reunan MySQL-ikonia → `Add Connection`.
+3. Täytä tiedot:
 
-Klikkaa Connect
+   | Kenttä   | Arvo                  |
+   |----------|-----------------------|
+   | Host     | localhost             |
+   | User     | root                  |
+   | Password | `.env`-tiedostoon asettamasi salasana |
+   | Port     | 3307                  |
 
-Jos kaikki meni oikein, näet tietokannat vasemmalla 🎉
+4. Klikkaa `Connect` – tietokannat näkyvät vasemmalla paneelissa.
 
------------------------------------------------------------------
-Sähköpostin lähetys
+---
 
+## Sähköpostin lähetys (Mailtrap)
 
-1. Mailtrap-tunnusten luonti
-Mene osoitteeseen mailtrap.io ja luo ilmainen tili.
+Projekti käyttää [Mailtrap](https://mailtrap.io)-sandboxia sähköpostien testaamiseen kehitysvaiheessa.
 
-Mene kohtaan Inboxes -> My Inbox.
+### Tunnusten luonti
 
-Valitse SMTP Settings -välilehdeltä integraatioksi Spring Boot.
+1. Luo ilmainen tili osoitteessa [mailtrap.io](https://mailtrap.io).
+2. Mene `Inboxes → My Inbox`.
+3. Valitse `SMTP Settings`-välilehdeltä integraatioksi **Spring Boot**.
+4. Kopioi `username` ja `password`.
 
-2. Tunnusten lisäys koodiin
+### Tunnusten lisäys projektiin
 
-Etsi sieltä username ja password ja kopioi ne.
+Lisää kopioimasi tunnukset **molempiin** tiedostoihin:
 
---------------------------------------------------------------------------------------------------------------
-3. Profiilien päivitys (application.properties)
-Lisää kopioimasi tiedot projektin asetuksiin. Jotta homma toimii oikein kehitysvaiheessa, päivitä nämä molempiin tiedostoihin:
+**`backend/infrastructure/src/main/resources/application.properties`**
 
-Tiedosto 1: backend/infrastructure/src/main/resources/application.properties
-Properties
-
+```properties
 spring.mail.host=sandbox.smtp.mailtrap.io
-
 spring.mail.port=2525
-
-spring.mail.username=SINUN_USERNAM_TÄHÄN
-
+spring.mail.username=SINUN_USERNAME_TÄHÄN
 spring.mail.password=SINUN_SALASANA_TÄHÄN
+```
 
-------------------------------------------------------------------------------------
+**`backend/infrastructure/src/main/resources/application-dev.properties`**
 
-Tiedosto 2: backend/infrastructure/src/main/resources/application-dev.properties
-
-Asetukset:
-
-# Sähköpostipalvelimen osoite (Mailtrap sandbox)
+```properties
 spring.mail.host=sandbox.smtp.mailtrap.io
-
 spring.mail.port=2525
-
-
-# Mailtrapista haetut henkilökohtaiset tunnukset
-
-spring.mail.username=Kopioi_tähän_tunnus_mailtrapista
-
-spring.mail.password=Kopioi_tähän_salasana_mailtrapista
-
-# Lisäasetukset, jotta yhteys toimii suojatusti
-
+spring.mail.username=SINUN_USERNAME_TÄHÄN
+spring.mail.password=SINUN_SALASANA_TÄHÄN
 spring.mail.properties.mail.smtp.auth=true
-
 spring.mail.properties.mail.smtp.starttls.enable=true
+```
 
-------------------------------------------------------------------
+> **Muista:** Älä commitoi oikeita tunnuksia versionhallintaan. Harkitse `.env`-pohjaista ratkaisua tuotantoa varten.
