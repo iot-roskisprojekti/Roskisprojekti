@@ -24,7 +24,17 @@ public class TaskController {
 
     @PostMapping("/{id}/complete")
     public ResponseEntity<Void> completeTask(@PathVariable Long id) {
-        System.out.println("DEBUG: Yritettiin kuitata tehtävä: " + id);
-        return ResponseEntity.ok().build();
+        try {
+            System.out.println("DEBUG: Aloitetaan kuittaus ID:lle: " + id);
+            
+            manageTasksUseCase.complete(id);
+            
+            System.out.println("DEBUG: Kuittaus onnistui tietokantaan!");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("VIRHE KUITTAUKSESSA: " + e.getMessage());
+            e.printStackTrace(); 
+            return ResponseEntity.status(500).build();
+        }
     }
 }
