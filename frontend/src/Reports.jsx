@@ -11,9 +11,12 @@ export default function Reports({ containers = [], completedTasks = [] }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (containers.length > 0) {
-      setSelectedContainer(containers[0]);
-    }
+    if (containers.length === 0) return;
+
+    setSelectedContainer((prev) => {
+      if (!prev) return containers[0];
+      return containers.find(c => c.id === prev.id) || containers[0];
+    });
   }, [containers]);
 
   useEffect(() => {
