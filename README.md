@@ -183,7 +183,7 @@ Projekti käyttää [Mailtrap](https://mailtrap.io)-sandboxia sähköpostien tes
 
 Lisää kopioimasi tunnukset **molempiin** tiedostoihin:
 
-**`backend/infrastructure/src/main/resources/application.properties`**
+**`backend/bootstrap/src/main/resources/application.properties`**
 
 ```properties
 spring.mail.host=sandbox.smtp.mailtrap.io
