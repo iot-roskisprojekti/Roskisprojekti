@@ -192,7 +192,7 @@ spring.mail.username=SINUN_USERNAME_TÄHÄN
 spring.mail.password=SINUN_SALASANA_TÄHÄN
 ```
 
-**`backend/infrastructure/src/main/resources/application-dev.properties`**
+**`backend/bootstrap/src/main/resources/application-docker.properties`**
 
 ```properties
 spring.mail.host=sandbox.smtp.mailtrap.io
