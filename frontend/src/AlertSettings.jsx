@@ -86,6 +86,37 @@ export default function AlertSettings({ alertSettings, setAlertSettings }) {
   };
 
   return (
+  <div>
+    <div className="alert alert-warning" style={{ maxWidth: "400px", margin: "20px auto 0" }}>
+      ⚠️ Hälytysrajojen muokkaus ei ole käytössä tässä demoversiossa. Rajat on määritelty järjestelmään kiinteästi.
+    </div>
+
+    <div style={{ maxWidth: "400px", margin: "16px auto 0", padding: "16px", backgroundColor: "#fff", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+      <h5 style={{ marginBottom: "12px" }}>Voimassa olevat raja-arvot</h5>
+      <table className="table table-bordered mb-0">
+        <thead>
+          <tr>
+            <th>Tila</th>
+            <th>Täyttöaste</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span style={{ color: "#198754", fontWeight: "bold" }}>● Normaali</span></td>
+            <td>0–69 %</td>
+          </tr>
+          <tr>
+            <td><span style={{ color: "#fd7e14", fontWeight: "bold" }}>● Varoitus</span></td>
+            <td>70–84 %</td>
+          </tr>
+          <tr>
+            <td><span style={{ color: "#dc3545", fontWeight: "bold" }}>● Kriittinen</span></td>
+            <td>85–100 %</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
       <div style={{ padding: "20px", maxWidth: "400px", width: "100%" }}>
         <h2>Hälytysrajat</h2>
@@ -122,5 +153,6 @@ export default function AlertSettings({ alertSettings, setAlertSettings }) {
         </button>
       </div>
     </div>
-  );
+  </div>
+);
 }
