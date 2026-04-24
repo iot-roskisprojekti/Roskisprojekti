@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch: backend (on host)",
+      "request": "launch",
+      "mainClass": "org.example.RoskisposkisApplication",
+      "projectName": "roskisposkis",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": ""
+    },
+        {
+      "type": "java",
+      "name": "Launch: backend (on dev cont)",
+      "request": "launch",
+      "mainClass": "org.example.RoskisposkisApplication",
+      "projectName": "roskisposkis",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=docker"
+    },
+    {
+      "type": "node",
+      "name": "Launch: frontend (on dev cont)",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+    "name": "Full Stack (on dev cont)",
+    "configurations": ["Launch: backend (on dev cont)", "Launch: frontend (on dev cont)"]
+    }
+  ]
+}

@@ -1,0 +1,232 @@
+openapi: 3.0.3
+info:
+  title: Roskisprojekti API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+
+paths:
+
+  /sites:
+    get:
+      summary: Hae kaikki säiliöt
+      responses:
+        "200":
+          description: Lista säiliöistä
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Site"
+
+    post:
+      summary: Luo uusi säiliö
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSiteRequest"
+      responses:
+        "200":
+          description: Luotu säiliö
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Site"
+
+  /sites/{id}:
+    put:
+      summary: Päivitä säiliö
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSiteRequest"
+      responses:
+        "200":
+          description: Päivitetty säiliö
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Site"
+
+    delete:
+      summary: Poista säiliö
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Poisto onnistui
+
+  /alerts:
+    get:
+      summary: Hae hälytykset
+      responses:
+        "200":
+          description: Lista hälytyksistä
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+  /tasks:
+    post:
+      summary: Luo tehtävä hälytyksestä
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alertId]
+              properties:
+                alertId:
+                  type: integer
+      responses:
+        "200":
+          description: Tehtävä luotu
+
+  /tasks/{id}/complete:
+    post:
+      summary: Kuittaa tehtävä
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tehtävä kuitattu
+
+  /alert-settings:
+    get:
+      summary: Hae hälytysrajat
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlertSettings"
+
+    put:
+      summary: Päivitä hälytysrajat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertSettings"
+      responses:
+        "200":
+          description: Päivitetty
+
+  /containers/{id}/history:
+    get:
+      summary: Hae säiliön historia
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContainerHistoryResponse"
+
+components:
+  schemas:
+
+    Site:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        fillPercent:
+          type: number
+        capacity:
+          type: number
+
+    CreateSiteRequest:
+      type: object
+      required: [location]
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        capacity:
+          type: number
+
+    UpdateSiteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        capacity:
+          type: number
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        siteName:
+          type: string
+        fillPercent:
+          type: number
+
+    AlertSettings:
+      type: object
+      properties:
+        warningLevel:
+          type: number
+        criticalLevel:
+          type: number
+
+    ContainerHistoryResponse:
+      type: object
+      properties:
+        history:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+              fillLevel:
+                type: number
+        emptyHistory:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+              emptied:
+                type: number

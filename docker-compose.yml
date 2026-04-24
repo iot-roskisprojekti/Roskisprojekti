@@ -1,0 +1,68 @@
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile #Dockerfile jolla rakennellaan backendistä .jar
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"  
+    volumes:
+      - ./backend/bootstrap/src/main/resources/application-docker.properties:/app/config/application-docker.properties
+    environment:
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/app/config/
+      - SPRING_PROFILES_ACTIVE=docker
+
+      - SPRING_MAIL_USERNAME=${MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - roskis_net        
+  db:
+    image: mysql:8.0.36
+    command: 
+      - "--bind-address=0.0.0.0"
+      - "--skip-name-resolve"
+      - "--log-error-verbosity=1"
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+      
+    volumes:
+      - roskis_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${HOST_DB_PORT}:3306"
+    networks:
+      - roskis_net
+
+  mqtt:
+    image: eclipse-mosquitto:2.0.18
+    ports:
+      - "${HOST_MQTT_PORT}:1883"
+      - "${HOST_MQTT_WS_PORT}:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - roskis_net
+
+networks:
+  roskis_net:
+    driver: bridge
+
+
+volumes:
+  roskis_mysql_data:
+  roskis_mqtt_data:
+  roskis_mqtt_log:
